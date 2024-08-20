@@ -1,0 +1,16 @@
+.navContainer {
+    position: sticky;
+    top: 0;
+    height: 100px;
+    background-color: #ececec; /* Background color for the nav */
+    color: rgb(8, 8, 8); /* Text color */
+    z-index: 1000;
+  }
+
+.navContainer ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    gap: 10px;
+}
