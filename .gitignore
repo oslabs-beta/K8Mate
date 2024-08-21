@@ -1,0 +1,113 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+*.log
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Python
+*.pyc
+__pycache__/
+
+# Environment variables
+.env
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build directories
+dist/
+build/
+out/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Compiled files
+*.out
+*.obj
+*.exe
+
+# JavaScript
+*.bundle.js
+
+# C++
+*.dSYM/
+*.exe
+
+# Static site generator files
+public/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package files
+*.tgz
+*.zip
+*.tar.gz
+*.rar
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+node_modules/
+bower_components/
+
+# Minified files
+*.min.js
+*.min.css
+
+# Build files
+*.map
+*.lock
+
+# Environment
+.env
+.env.*.local
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# JetBrains IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# React Native
+.expo/
+.expo-shared/
