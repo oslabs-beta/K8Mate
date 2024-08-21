@@ -64,12 +64,12 @@ function Alerts() {
         // setCpuData(data);
         // console.log('pod restarts', data)
         let podRestartCount = 0;
-        for (let i = 0; i < data.data.results.length; i++) {
+        for (let i = 0; i < data.data.result.length; i++) {
           // let podRestartCount = data.data.results[i].value[1];
           // if (podRestartCount > 0){
           //   podAlert();
           // }
-          podRestartCount += Number(data.data.results[i].value[1])
+          podRestartCount += Number(data.data.result[i].value[1])
         }
         setRestartedPods(podRestartCount);
       }
