@@ -11,6 +11,7 @@ import {
   DropdownLabel,
   DropdownMenu,
 } from './template/dropdown'
+
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/navbar'
 import {
   Sidebar,
@@ -77,8 +78,9 @@ function AccountDropdownMenu({ anchor }) {
 }
 
 
-export function ApplicationLayout({ events, children, showSidebar, setShowSidebar }) {
+export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
 
+  console.log('app layout rendered')
   return (
     <SidebarLayout
       sidebar={

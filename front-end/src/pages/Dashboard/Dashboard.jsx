@@ -1,19 +1,34 @@
-import React from 'react'
+  import React from 'react'
+  import DashboardRow from '../../components/custom/DashboardRow/DashboardRow.jsx';
 
-function Dashboard() {
-  return (
-    <>
-    <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=76" width="900" height="400" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=52" width="1000" height="200" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=75" width="600" height="400" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=24" width="300" height="200" frameBorder="0"></iframe>
-    
-    <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=18" width="300" height="200" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=30" width="450" height="200" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=32" width="450" height="200" frameBorder="0"></iframe>
-    <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=38" width="450" height="200" frameBorder="0"></iframe>
-    </>
-  )
-}
+  import styles from './Dashboard.module.css'
 
-export default Dashboard
+  function Dashboard(props) {
+    console.log('dash', props)
+
+    return (
+      <div className={styles.dashboardContainer}>
+        {console.log('rendered')}
+
+        {/* Two graphs side by side on large screens, one on small screens */}
+        <DashboardRow colsSmall={1} colsLarge={2}>
+          <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=76"></iframe>
+          <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=75"></iframe>
+        </DashboardRow>
+        
+        {/* One graph across the entire width */}
+        <DashboardRow colsSmall={1} colsLarge={1}>
+          <iframe src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=52"></iframe>
+        </DashboardRow>
+        
+        {/* Three graphs side by side on large screens, one on small screens */}
+        <DashboardRow colsSmall={1} colsLarge={3}>
+          <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=24"></iframe>
+          <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=18"></iframe>
+          <iframe src="http://localhost:3000/d-solo/4XuMd2Iiz/kubernetes-cluster-prometheus?orgId=1&refresh=5s&panelId=30"></iframe>
+        </DashboardRow>
+      </div>
+    );
+  }
+
+  export default Dashboard
