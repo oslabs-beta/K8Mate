@@ -4,10 +4,103 @@ import { useState, useEffect } from 'react'
 function Alerts() {
   const [ cpuData, setCpuData ] = useState([]);
   const [ runningPods, setRunningPods ] = useState(null);
+  const [ podDetails, setPodDetails] = useState([]); //array of pod names to compare
+  const [ prevPodDetails, setPrevPodDetails ] = useState([]);
   const [ failedPods, setFailedPods ] = useState(0);
   const [ prevFailedPods, setPrevFailedPods ] = useState(0);
   const [ restartedPod, setRestartedPods ] = useState(0);
   const [ prevRestartedPod, setPrevRestartedPods ] = useState(0)
+
+  // alerts requests to backend
+  const sendCpuAlert = async (cpuUsageValue) => {
+    try {
+      const response = await fetch ('http://localhost:8080/alert/all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          alert: `CPU usage is high: ${cpuUsageValue}%`
+          // category: cpu
+        })
+      });
+      if (response.ok){
+        console.log('CPU alert was sent successfully');
+      } else {
+        console.log('cpu alert failed to send');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const podFailedAlert = async (failedPod) => {
+    try {
+      const response = await fetch ('http://localhost:8080/alert/all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          alert: `${failedPod} has failed`,
+          podId: failedPod[0],
+          // pod id, previous pod name, alert log, category: pods
+        })
+      });
+      if (response.ok){
+        console.log('Failed pod alert was sent successfully');
+      } else {
+        console.log('Failed pod alert failed to send');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
+
+
+  //grab details of all current pods
+  useEffect(() => {
+    const pods = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/query?query=kube_pod_info')
+        const data = await response.json();
+        console.log('pod descriptions', data)
+        const podNames = data.data.result.map((pod) => pod.metric.pod)
+        setPodDetails(podNames);
+      }
+      catch(err) {
+        console.log(err)
+      }
+    }
+    pods();
+    const intervalID = setInterval(() => {
+      pods()
+    }, 5000)
+
+    return () => clearInterval(intervalID);
+  }, [])
+
+  //set previous pod names to current at startup
+  useEffect(() => {
+    setPrevPodDetails(podDetails)
+  }, [])
+
+  //checks if current pod name array is different from prev pod name array
+  useEffect(() => {
+    const failedPod = prevPodDetails.filter(pod => !podDetails.includes(pod)) 
+    const restartedPod = podDetails.filter(pod => !prevPodDetails.includes(pod))
+    console.log(podDetails)
+    console.log(prevPodDetails)
+    console.log("TESTING TESTING TESTING"+ failedPod);
+    if (failedPod.length > 0 && podDetails.length === prevPodDetails.length) {
+      // podFailedAlert(failedPod);
+      alert(`Pod "${failedPod[0]}" has failed and has been restarted with "${restartedPod[0]}"`)
+    }
+    setPrevPodDetails(podDetails);
+  }, [podDetails, prevPodDetails])
+
 
   //node sessions 
   useEffect(() => {
@@ -32,11 +125,13 @@ function Alerts() {
         const data = await response.json();
         // iterate over result index number for each node
         for (let i = 0; i < data.data.result.length; i++){
+          // want specific node name + cpu usage
           const cpuUsageValue = data.data.result[i].value[1];
           console.log(cpuUsageValue);
           // alert base case
           setCpuData(cpuUsageValue);
           if (cpuUsageValue > cpuThreshold) {
+            await sendCpuAlert(cpuUsageValue);
             cpuAlert(cpuUsageValue);
         }
 
@@ -56,47 +151,47 @@ function Alerts() {
   }
 
   // grab amount of time pods restarted
-  useEffect(() => {
-    const podRestart = async () => {
-      try {
-        const response = await fetch('http://localhost:9090/api/v1/query?query=increase(kube_pod_container_status_restarts_total[5m])');
-        const data = await response.json();
-        // setCpuData(data);
-        // console.log('pod restarts', data)
-        let podRestartCount = 0;
-        for (let i = 0; i < data.data.result.length; i++) {
-          // let podRestartCount = data.data.results[i].value[1];
-          // if (podRestartCount > 0){
-          //   podAlert();
-          // }
-          podRestartCount += Number(data.data.result[i].value[1])
-        }
-        setRestartedPods(podRestartCount);
-      }
-      catch(err){
-        console.log(err)
-      }
-    }
-    podRestart();
-    const intervalID = setInterval(() => {
-      podRestart();
-    }, 5000)
+  // useEffect(() => {
+  //   const podRestart = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:9090/api/v1/query?query=increase(kube_pod_container_status_restarts_total[5m])');
+  //       const data = await response.json();
+  //       // setCpuData(data);
+  //       // console.log('pod restarts', data)
+  //       let podRestartCount = 0;
+  //       for (let i = 0; i < data.data.result.length; i++) {
+  //         // let podRestartCount = data.data.results[i].value[1];
+  //         // if (podRestartCount > 0){
+  //         //   podAlert();
+  //         // }
+  //         podRestartCount += Number(data.data.result[i].value[1])
+  //       }
+  //       setRestartedPods(podRestartCount);
+  //     }
+  //     catch(err){
+  //       console.log(err)
+  //     }
+  //   }
+  //   podRestart();
+  //   const intervalID = setInterval(() => {
+  //     podRestart();
+  //   }, 5000)
 
-    return () => clearInterval(intervalID);
-  }, [])
+  //   return () => clearInterval(intervalID);
+  // }, [])
 
-  //checks if current restart pod count is greater than prev restart pod count
-  useEffect(() => {
-    if (restartedPod > prevRestartedPod) {
-      console.log('Pod has restarted');
-      podAlert();
-      setPrevRestartedPods(restartedPod)
-    }
-  }, [restartedPod])
+  // //checks if current restart pod count is greater than prev restart pod count
+  // useEffect(() => {
+  //   if (restartedPod > prevRestartedPod) {
+  //     console.log('Pod has restarted');
+  //     podAlert();
+  //     setPrevRestartedPods(restartedPod)
+  //   }
+  // }, [restartedPod])
 
-  const podAlert = () => {
-    alert('A pod just restarted')
-  }
+  // const podAlert = () => {
+  //   alert('A pod just restarted')
+  // }
  
   // grab number of running pods
   useEffect(() => {
