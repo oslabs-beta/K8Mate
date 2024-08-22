@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Tree from './pages/Tree/Tree';
 
 
-import Navbar from './components/custom/Navbar/Navbar';
+// import Navbar from './components/custom/Navbar/Navbar';
 import Footer from './components/custom/Footer/Footer';
 
 
@@ -29,12 +29,12 @@ function App() {
 
           <div className="content">
             <Routes>
-              <>
+              
                 <Route path="/" element= {<Home />}/>
                 <Route path="/alerts" element= {<Alerts />}/>
                 <Route path="/dashboard" element= {<Dashboard />}/>
                 <Route path="/tree" element= {<Tree />}/>
-              </>
+              
             </Routes>
           </div>
         </ApplicationLayout>
