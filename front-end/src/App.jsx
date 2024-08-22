@@ -9,11 +9,7 @@ import Home from './pages/Home/Home';
 import Alerts from './pages/Alerts/Alerts';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Tree from './pages/Tree/Tree';
-
-
-// import Navbar from './components/custom/Navbar/Navbar';
-import Footer from './components/custom/Footer/Footer';
-
+import Notfound from './pages/Notfound/Notfound'
 
 import { ApplicationLayout } from './components/application-layout'
 
@@ -21,24 +17,28 @@ import { ApplicationLayout } from './components/application-layout'
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
 
-  return (
-    
-    <div className="App">
-      {/* <Navbar/> */}
-        <ApplicationLayout showSidebar={showSidebar} setShowSidebar={setShowSidebar}>
 
-          <div className="content">
-            <Routes>
-              
-                <Route path="/" element= {<Home />}/>
-                <Route path="/alerts" element= {<Alerts />}/>
-                <Route path="/dashboard" element= {<Dashboard />}/>
-                <Route path="/tree" element= {<Tree />}/>
-              
-            </Routes>
-          </div>
-        </ApplicationLayout>
-      {/* <Footer/> */}
+  // Helper function to wrap a component with ApplicationLayout
+  const withLayout = (Component) => {
+    return (
+      <ApplicationLayout showSidebar={showSidebar} setShowSidebar={setShowSidebar}>
+        <Component />
+      </ApplicationLayout>
+    );
+  };
+
+  return (
+    <div className="App">
+      <Routes>
+        {/* Use the helper function to apply the layout */}
+        <Route path="/" element={withLayout(Home)} />
+        <Route path="/alerts" element={withLayout(Alerts)} />
+        <Route path="/dashboard" element={withLayout(Dashboard)} />
+        <Route path="/tree" element={withLayout(Tree)} />
+
+        {/* Catch-all route without the layout */}
+        <Route path="*" element={<Notfound />} />
+      </Routes>
     </div>
   )
 }
