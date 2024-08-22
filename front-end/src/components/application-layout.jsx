@@ -1,5 +1,8 @@
 'use client'
 import { Avatar } from './template/avatar'
+import { useState } from 'react';
+
+
 import {
   Dropdown,
   DropdownButton,
@@ -22,6 +25,8 @@ import {
 } from './template/sidebar'
 import { SidebarLayout } from './template/sidebar-layout'
 
+import GithubIcon from './custom/GithubIcon/GithubIcon.jsx'
+
 import {
   ArrowRightStartOnRectangleIcon,
   ChevronDownIcon,
@@ -39,8 +44,12 @@ import {
   SparklesIcon,
   Square2StackIcon,
   TicketIcon,
+  ChartBarIcon,
+  GlobeAltIcon,
+  BellAlertIcon,
+  MapIcon,
 } from '@heroicons/react/20/solid'
-import { NavLink } from 'react-router-dom'  // Import NavLink from react-router-dom
+import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
 function AccountDropdownMenu({ anchor }) {
   return (
@@ -68,114 +77,54 @@ function AccountDropdownMenu({ anchor }) {
 }
 
 
-export function ApplicationLayout({ events, children }) {
+export function ApplicationLayout({ events, children, showSidebar, setShowSidebar }) {
+
   return (
     <SidebarLayout
-      navbar={
-        <Navbar>
-          <NavbarSpacer />
-          <NavbarSection>
-            <Dropdown>
-              <DropdownButton as={NavbarItem}>
-                <Avatar src="/users/erica.jpg" square />
-              </DropdownButton>
-              <AccountDropdownMenu anchor="bottom end" />
-            </Dropdown>
-          </NavbarSection>
-        </Navbar>
-      }
       sidebar={
         <Sidebar>
           <SidebarHeader>
-            <Dropdown>
-              <DropdownButton as={SidebarItem}>
-                <Avatar src="/teams/catalyst.svg" />
-                <SidebarLabel>Catalyst</SidebarLabel>
-                <ChevronDownIcon />
-              </DropdownButton>
-              <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
-                <DropdownItem as={NavLink} to="/settings" activeClassName="active">
-                  <Cog8ToothIcon />
-                  <DropdownLabel>Settings</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem as={NavLink} to="#" activeClassName="active">
-                  <Avatar slot="icon" src="/teams/catalyst.svg" />
-                  <DropdownLabel>Catalyst</DropdownLabel>
-                </DropdownItem>
-                <DropdownItem as={NavLink} to="#" activeClassName="active">
-                  <Avatar slot="icon" initials="BE" className="bg-purple-500 text-white" />
-                  <DropdownLabel>Big Events</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem as={NavLink} to="#" activeClassName="active">
-                  <PlusIcon />
-                  <DropdownLabel>New team&hellip;</DropdownLabel>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            <SidebarItem style={{ pointerEvents: 'none', cursor: 'default' }}>
+              <ChartBarIcon/>
+              <SidebarLabel>Catalyst™</SidebarLabel>
+            </SidebarItem>
           </SidebarHeader>
-
           <SidebarBody>
             <SidebarSection>
-              {/* <SidebarItem as={NavLink} to="/" activeClassName="active" exact>
+              <SidebarItem as={NavLink} to='/dashboard' current={useLocation().pathname === "/dashboard"} 
+              onClick={() => setShowSidebar(false)}
+              >
                 <HomeIcon />
-                <SidebarLabel>Home</SidebarLabel>
-              </SidebarItem> */}
-              <SidebarItem as={NavLink} to="/dashboard" activeClassName="active">
-                <Square2StackIcon />
                 <SidebarLabel>Dashboard</SidebarLabel>
               </SidebarItem>
-              <SidebarItem as={NavLink} to="/alerts" activeClassName="active">
-                <TicketIcon />
+              <SidebarItem as={NavLink} to="/alerts" current={useLocation().pathname === "/alerts"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <BellAlertIcon />
                 <SidebarLabel>Alerts</SidebarLabel>
               </SidebarItem>
-              <SidebarItem as={NavLink} to="/tree" activeClassName="active">
-                <Cog6ToothIcon />
+              <SidebarItem as={NavLink} to="/tree"  current={useLocation().pathname === "/tree"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <MapIcon />
                 <SidebarLabel>K8 Structure</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
-
-            {/* <SidebarSection className="max-lg:hidden">
-              <SidebarHeading>Upcoming Events</SidebarHeading>
-              {events.map((event) => (
-                <SidebarItem key={event.id} as={NavLink} to={event.url} activeClassName="active">
-                  {event.name}
-                </SidebarItem>
-              ))}
-            </SidebarSection> */}
-
             <SidebarSpacer />
 
             <SidebarSection>
-              <SidebarItem as={NavLink} to="#" activeClassName="active">
-                <QuestionMarkCircleIcon />
-                <SidebarLabel>Support</SidebarLabel>
+              
+              <SidebarItem as="div" onClick={() => window.open('https://github.com/oslabs-beta/super-kuber', '_blank', 'noopener noreferrer')}>
+                <GithubIcon />
+                <SidebarLabel>Github</SidebarLabel>
               </SidebarItem>
-              <SidebarItem as={NavLink} to="#" activeClassName="active">
-                <SparklesIcon />
-                <SidebarLabel>Changelog</SidebarLabel>
+              
+              <SidebarItem as="div" onClick={() => window.open('https://github.com/oslabs-beta/super-kuber', '_blank', 'noopener noreferrer')}>
+                <GlobeAltIcon />
+                <SidebarLabel>Website</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>
-
-          <SidebarFooter className="max-lg:hidden">
-            <Dropdown>
-              <DropdownButton as={SidebarItem}>
-                <span className="flex min-w-0 items-center gap-3">
-                  <Avatar src="/users/erica.jpg" className="size-10" square alt="" />
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">Erica</span>
-                    <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      erica@example.com
-                    </span>
-                  </span>
-                </span>
-                <ChevronUpIcon />
-              </DropdownButton>
-              <AccountDropdownMenu anchor="top start" />
-            </Dropdown>
-          </SidebarFooter>
         </Sidebar>
       }
     >
