@@ -19,13 +19,14 @@ import { ApplicationLayout } from './components/application-layout'
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showSidebar, setShowSidebar] = useState(false);
 
   return (
     
     <div className="App">
       {/* <Navbar/> */}
-        <ApplicationLayout>
+        <ApplicationLayout showSidebar={showSidebar} setShowSidebar={setShowSidebar}>
+
           <div className="content">
             <Routes>
               <>
