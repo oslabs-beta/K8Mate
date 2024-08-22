@@ -1,5 +1,6 @@
   import React, { useState } from 'react'
   import DashboardRow from '../../components/custom/DashboardRow/DashboardRow.jsx';
+  import { Heading } from '../../components/template/heading'
 
   import styles from './Dashboard.module.css'
 
@@ -14,7 +15,12 @@
     };
     
     return (
+      
       <div className={styles.dashboardContainer}>  
+        <div className="flex items-end justify-between gap-4">
+          <Heading>Dashboard</Heading>
+          {/* <Button className="-my-0.5">Create order</Button> */}
+        </div>
         {/* Two graphs side by side on large screens, one on small screens */}
         <DashboardRow colsSmall={1} colsLarge={2}>
           <iframe
