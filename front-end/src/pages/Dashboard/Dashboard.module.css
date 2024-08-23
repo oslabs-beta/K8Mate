@@ -1,0 +1,4 @@
+.dashboardContainer {
+    @apply
+        space-y-4;
+}

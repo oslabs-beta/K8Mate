@@ -1,0 +1,45 @@
+.colOne{
+    @apply
+        grid grid-cols-1
+        md:grid-cols-1
+        gap-4;
+}
+
+.colOne iframe {
+    @apply
+        w-full 
+        h-52
+        rounded lg:ring-1 lg:ring-zinc-950/5;
+}
+
+.colTwo{
+    @apply
+        grid grid-cols-1
+        md:grid-cols-2
+        gap-4;
+        
+}
+
+.colTwo iframe {
+    @apply
+        w-full 
+        h-80
+        rounded lg:ring-1 lg:ring-zinc-950/5;
+}
+
+
+.colThree {
+    @apply
+        grid grid-cols-1
+        md:grid-cols-3
+        gap-4;
+}
+
+
+.colThree iframe {
+    @apply
+        w-full
+        h-64
+        rounded lg:ring-1 lg:ring-zinc-950/5;
+}
+

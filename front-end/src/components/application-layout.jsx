@@ -11,6 +11,7 @@ import {
   DropdownLabel,
   DropdownMenu,
 } from './template/dropdown'
+
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/navbar'
 import {
   Sidebar,
@@ -51,34 +52,8 @@ import {
 } from '@heroicons/react/20/solid'
 import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
-function AccountDropdownMenu({ anchor }) {
-  return (
-    <DropdownMenu className="min-w-64" anchor={anchor}>
-      <DropdownItem href="#">
-        <UserCircleIcon />
-        <DropdownLabel>My account</DropdownLabel>
-      </DropdownItem>
-      <DropdownDivider /> {/* Self-closing tag */}
-      <DropdownItem href="#">
-        <ShieldCheckIcon />
-        <DropdownLabel>Privacy policy</DropdownLabel>
-      </DropdownItem>
-      <DropdownItem href="#">
-        <LightBulbIcon />
-        <DropdownLabel>Share feedback</DropdownLabel>
-      </DropdownItem> {/* Correctly closed DropdownItem */}
-      <DropdownDivider /> {/* Self-closing tag */}
-      <DropdownItem href="#">
-        <ArrowRightStartOnRectangleIcon />
-        <DropdownLabel>Sign out</DropdownLabel>
-      </DropdownItem>
-    </DropdownMenu>
-  )
-}
 
-
-export function ApplicationLayout({ events, children, showSidebar, setShowSidebar }) {
-
+export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
   return (
     <SidebarLayout
       sidebar={
@@ -86,7 +61,7 @@ export function ApplicationLayout({ events, children, showSidebar, setShowSideba
           <SidebarHeader>
             <SidebarItem style={{ pointerEvents: 'none', cursor: 'default' }}>
               <ChartBarIcon/>
-              <SidebarLabel>Catalyst™</SidebarLabel>
+              <SidebarLabel>Super Kuber™</SidebarLabel>
             </SidebarItem>
           </SidebarHeader>
           <SidebarBody>
