@@ -84,6 +84,17 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 <MapIcon />
                 <SidebarLabel>K8 Structure</SidebarLabel>
               </SidebarItem>
+
+              {/* TO BE REMOVED */}
+              <SidebarItem as={NavLink} to="/flow"  current={useLocation().pathname === "/tree"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <MapIcon />
+                <SidebarLabel>ReactFlowTest</SidebarLabel>
+              </SidebarItem>
+
+
+
             </SidebarSection>
             <SidebarSpacer />
 

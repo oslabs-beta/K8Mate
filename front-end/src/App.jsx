@@ -9,7 +9,8 @@ import Home from './pages/Home/Home';
 import Alerts from './pages/Alerts/Alerts';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Tree from './pages/Tree/Tree';
-import Notfound from './pages/Notfound/Notfound'
+import Notfound from './pages/Notfound/Notfound';
+import Flow from './pages/Flow/Flow';
 
 import { ApplicationLayout } from './components/application-layout'
 
@@ -35,6 +36,9 @@ function App() {
         <Route path="/alerts" element={withLayout(Alerts)} />
         <Route path="/dashboard" element={withLayout(Dashboard)} />
         <Route path="/tree" element={withLayout(Tree)} />
+
+        {/* TO BE REMOVED */}
+        <Route path="/flow" element={withLayout(Flow)} />
 
         {/* Catch-all route without the layout */}
         <Route path="*" element={<Notfound />} />
