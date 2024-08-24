@@ -36,7 +36,7 @@ const AlertsProvider = ({ children }) => {
   //pod fail POST
   const podFailedAlert = async (failedPod, failedPodID) => {
     try {
-      const response = await fetch ('http://localhost:8080/alert/all', {
+      const response = await fetch ('http://localhost:8080/alert/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ const AlertsProvider = ({ children }) => {
   //pod restart POST
   const podRestartAlert = async (restartedPod, restartedPodID) => {
     try {
-      const response = await fetch ('http://localhost:8080/alert/all', {
+      const response = await fetch ('http://localhost:8080/alert/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
