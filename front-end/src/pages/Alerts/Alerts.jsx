@@ -12,6 +12,68 @@ import { Select } from '../../components/template/select'
 
 function Alerts() {
 
+  const [ alertList, setAlertList ] = useState([]);
+  
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try{
+        const response = await fetch('http://localhost:8080/alert/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        if (response.ok) {
+          const alerts = await response.json()
+          setAlertList(alerts);
+          console.log('THESE ARE THE ALERTS', alerts)
+        }
+      } catch(err) {
+        console.log(err);
+      }
+    }
+    fetchAlerts();
+  }, [])
+  
+  // useEffect(() => {
+  //   //UNREAD
+  //   const unreadAlerts = alertList.filter(alert => {
+  //     alert.read === 'unread'
+  //   })
+  //   setUnreadList(unreadAlerts);
+    
+  //   //READ
+  //   const readAlerts = alertList.filter(alert => {
+  //     alert.read = 'read'
+  //   })
+  //   setReadList(readAlerts);
+  //   console.log('UNREAD ALERTS', unreadAlerts);
+  //   console.log('READ ALERTS', readAlerts);
+    
+  // }, [alertList])
+
+
+  const updateAlerts = async (alertId, alertName) => {
+    try{
+      const response = await fetch('http://localhost:8080/alert/update', {
+        method: 'PUT',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: alertId,
+          name: alertName
+        })
+      });
+      const data = await response.json();
+      console.log('Alert updated: ', data)
+    } catch(err){
+      console.log(err)
+    }
+  }
+
+  
+
   // replace with fetch request
   let alerts = [
     {
@@ -58,22 +120,28 @@ function Alerts() {
         <TableHead>
           <TableRow>
             <TableHeader>Id</TableHeader>
-            <TableHeader>Alert Date</TableHeader>
-            <TableHeader>Description</TableHeader>
+            <TableHeader>Component Name</TableHeader>
+            <TableHeader>Message</TableHeader>
+            <TableHeader>Category</TableHeader>
+            <TableHeader>Time Stamp</TableHeader>
             <TableHeader>Status</TableHeader>
+            
             {/*<TableHeader className="text-right">Amount</TableHeader> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {alerts.map((alert) => (
-            (alert.status === 'unread' && 
-            <TableRow key={alert.id}>
-              <TableCell>{alert.id}</TableCell>
-              <TableCell className="text-zinc-500">{alert.date}</TableCell>
-              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.description}</TableCell>
+          {alertList.map((alert) => (
+            (alert.read === 'unread' && 
+            <TableRow key={alert.node_id}>
+              <TableCell>{alert.node_id}</TableCell>
+              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.node_name}</TableCell>
+              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
+              <TableCell>{alert.category}</TableCell>
+              <TableCell>{alert.created_at}</TableCell>
+              {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
               <TableCell>
                 <Select name="status">
-                  <option value="active">Unread</option>
+                  <option value="active">{alert.read}</option>
                   <option value="completed">Read</option>
                 </Select>
               </TableCell>
@@ -107,27 +175,30 @@ function Alerts() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {alerts.map((alert) => (
-            (alert.status === 'read' && 
-            <TableRow key={alert.id}>
-              <TableCell>{alert.id}</TableCell>
-              <TableCell className="text-zinc-500">{alert.date}</TableCell>
-              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.description}</TableCell>
-              <TableCell>
-                <Select name="status">
-                  <option value="active">Unread</option>
-                  <option value="completed">Read</option>
-                </Select>
-              </TableCell>
+          {alertList.map((alert) => (
+            (alert.read === 'read' && 
+            <TableRow key={alert.node_id}>
+            <TableCell>{alert.node_id}</TableCell>
+            <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.node_name}</TableCell>
+            <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
+            <TableCell>{alert.category}</TableCell>
+            <TableCell>{alert.created_at}</TableCell>
+            {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
+            <TableCell>
+              <Select name="status">
+                <option value="active">{alert.read}</option>
+                <option value="completed">Read</option>
+              </Select>
+            </TableCell>
 
-              {/* <TableCell>
-                <div className="flex items-center gap-2">
-                  <Avatar src={order.event.thumbUrl} className="size-6" />
-                  <span>{order.event.name}</span>
-                </div>
-              </TableCell> */}
-              {/* <TableCell className="text-right">US{order.amount.usd}</TableCell> */}
-            </TableRow>
+            {/* <TableCell>
+              <div className="flex items-center gap-2">
+                <Avatar src={order.event.thumbUrl} className="size-6" />
+                <span>{order.event.name}</span>
+              </div>
+            </TableCell> */}
+            {/* <TableCell className="text-right">US{order.amount.usd}</TableCell> */}
+          </TableRow>
           ))
         )}
         </TableBody>
