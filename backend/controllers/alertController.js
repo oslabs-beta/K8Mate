@@ -25,7 +25,17 @@ alertController.createAlert = (req, res, next) => {
 }
 
 alertController.getAlert = (req, res, next) => {
+  const qstring = `SELECT * FROM alerts WHERE read = 'unread'`;
 
+  db.query(qstring)
+    .then((data) => {
+      console.log(data.rows);
+      res.locals.alerts = data.rows;
+      return next();
+    })
+    .catch((err) => {
+      return next(err);
+    })
 }
 
 module.exports = alertController;
