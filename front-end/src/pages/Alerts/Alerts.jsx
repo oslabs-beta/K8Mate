@@ -12,6 +12,33 @@ import { Select } from '../../components/template/select'
 
 function Alerts() {
 
+  const [ alertList, setAlertList ] = useState([]);
+  //unread list
+  //read list
+  //somewhere below, use useEffects to filter our current alertList to separate unread and read, then set unread list to unread filter and read list to read filter
+    //in the dependancy arrays, both will be listening for changes made to alertList state
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try{
+        const response = await fetch('http://localhost:8080/alert/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        if (response.ok) {
+          const alerts = await response.json()
+          setAlertList(alerts);
+        }
+      } catch(err) {
+        console.log(err);
+      }
+    }
+    fetchAlerts();
+  }, [])
+
+  
+
   // replace with fetch request
   let alerts = [
     {
@@ -65,12 +92,14 @@ function Alerts() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {alerts.map((alert) => (
+          {alertList.map((alert) => (
             (alert.status === 'unread' && 
             <TableRow key={alert.id}>
               <TableCell>{alert.id}</TableCell>
-              <TableCell className="text-zinc-500">{alert.date}</TableCell>
-              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.description}</TableCell>
+              <TableCell>{alert.name}</TableCell>
+              <TableCell>{alert.category}</TableCell>
+              {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
+              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
               <TableCell>
                 <Select name="status">
                   <option value="active">Unread</option>

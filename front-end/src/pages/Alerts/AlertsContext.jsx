@@ -72,7 +72,7 @@ const AlertsProvider = ({ children }) => {
           id: restartedPodID,
           category: 'Pod',
           name: restartedPod,
-          log: `${restartedPod} has restarted`
+          log: `${restartedPod} has restarted`,
         })
       });
       if (response.ok){
