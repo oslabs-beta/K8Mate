@@ -6,11 +6,14 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
+import { AlertsProvider } from './pages/Alerts/AlertsContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <AlertsProvider>
     <BrowserRouter>
-    <App />
+     <App />
     </BrowserRouter>
+    </AlertsProvider>
   </StrictMode>,
 )
