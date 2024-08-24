@@ -17,4 +17,12 @@ router.get('/all',
   }
 )
 
+router.put('/update',
+  alertController.updateAlert,
+  (req, res) => {
+    return res.status(200).json(res.locals);
+  }
+)
+
+
 module.exports = router;
