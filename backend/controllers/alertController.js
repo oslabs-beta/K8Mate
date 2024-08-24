@@ -25,12 +25,29 @@ alertController.createAlert = (req, res, next) => {
 }
 
 alertController.getAlert = (req, res, next) => {
-  const qstring = `SELECT * FROM alerts WHERE read = 'unread'`;
+  const qstring = `SELECT * FROM alerts`;
 
   db.query(qstring)
     .then((data) => {
       console.log(data.rows);
       res.locals.alerts = data.rows;
+      return next();
+    })
+    .catch((err) => {
+      return next(err);
+    })
+}
+
+alertController.updateAlert = (req, res, next) => {
+  const {id, name, status} = req.body;
+  const values = [id, name, status]
+  const qstring = `UPDATE alerts SET read = $3 WHERE node_id = $1 AND node_name = $2`;
+
+  db.query(qstring, values)
+    .then((data) => {
+      console.log('updated successfully');
+      console.log(data);
+      res.locals.alert = data;
       return next();
     })
     .catch((err) => {
