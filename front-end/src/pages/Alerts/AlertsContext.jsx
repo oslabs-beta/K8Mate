@@ -91,7 +91,7 @@ const AlertsProvider = ({ children }) => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=kube_pod_info')
         const data = await response.json();
-        console.log('pod descriptions', data)
+        // console.log('pod descriptions', data)
         const podData = data.data.result.map((pod) => {
           return {
           podName: pod.metric.pod,
@@ -130,10 +130,10 @@ const AlertsProvider = ({ children }) => {
         prevPod.podName === currentPod.podName && prevPod.podID === currentPod.podID
       )
     );
-    console.log('failed', failedPod)
-    console.log('restart', restartedPod)
-    console.log(podDetails)
-    console.log(prevPodDetails)
+    // console.log('failed', failedPod)
+    // console.log('restart', restartedPod)
+    // console.log(podDetails)
+    // console.log(prevPodDetails)
     if (failedPod.length > 0 && podDetails.length === prevPodDetails.length) {
       podFailedAlert(failedPod[0].podName, failedPod[0].podID);
       podRestartAlert(restartedPod[0].podName, restartedPod[0].podID)
@@ -167,7 +167,7 @@ const AlertsProvider = ({ children }) => {
         const data = await response.json();
         
         const cpuUsagePerNode = data.data.result.map((cpuUse) => cpuUse.value[1]);
-        console.log(cpuUsagePerNode);
+        // console.log(cpuUsagePerNode);
 
         setCpuData(cpuUsagePerNode);
        
