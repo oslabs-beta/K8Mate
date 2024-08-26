@@ -39,9 +39,9 @@ alertController.getAlert = (req, res, next) => {
 }
 
 alertController.updateAlert = (req, res, next) => {
-  const {id, name, status} = req.body;
-  const values = [id, name, status]
-  const qstring = `UPDATE alerts SET read = $3 WHERE node_id = $1 AND node_name = $2`;
+  const {id, name, status, db_id} = req.body;
+  const values = [id, name, status, db_id]
+  const qstring = `UPDATE alerts SET read = $3 WHERE (node_id = $1 AND node_name = $2 AND id = $4)`;
 
   db.query(qstring, values)
     .then((data) => {
