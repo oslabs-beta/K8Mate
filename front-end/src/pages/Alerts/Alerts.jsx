@@ -6,6 +6,9 @@ import { Button } from '../../components/template/button'
 import { Heading, Subheading } from '../../components/template/heading'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/table'
 import { Select } from '../../components/template/select'
+
+import { convertToPSTMilitaryTime } from '../../hooks/useData.js'
+
 // import { updateAlert } from '../../../../backend/controllers/alertController'
 
 
@@ -67,41 +70,6 @@ function Alerts() {
     updateAlerts(alertId, alertName, id, newStatus);
   }
 
-  // replace with fetch request
-  // let alerts = [
-  //   {
-  //     id: 1,
-  //     date: 'Aug 1, 2024',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  //     status: 'unread',
-  //   },
-  //   {
-  //     id: 2,
-  //     date: 'Aug 3, 2024',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  //     status: 'unread',
-  //   },
-  //   {
-  //     id: 3,
-  //     date: 'Aug 12, 2024',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  //     status: 'read',
-  //   },
-  //   {
-  //     id: 4,
-  //     date: 'Aug 16, 2024',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  //     status: 'unread',
-  //   },
-  //   {
-  //     id: 5,
-  //     date: 'Aug 17, 2024',
-  //     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  //     status: 'read',
-  //   },
-
-  // ]
-
   return (
     <>
       <div className="flex items-end justify-between gap-4">
@@ -112,7 +80,7 @@ function Alerts() {
       <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
-            <TableHeader>Id</TableHeader>
+            {/* <TableHeader>Id</TableHeader> */}
             <TableHeader>Component Name</TableHeader>
             <TableHeader>Message</TableHeader>
             <TableHeader>Category</TableHeader>
@@ -126,11 +94,20 @@ function Alerts() {
           {alertList.map((alert) => (
             (alert.read === 'unread' && 
             <TableRow key={alert.id}>
-              <TableCell>{alert.node_id}</TableCell>
-              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.node_name}</TableCell>
+              <TableCell className="whitespace-normal max-w-sm max-h-24">
+                <div className = "flex flex-col">
+                  <div>{alert.node_name}</div>
+                  <div className = "text-xs text-gray-400">ID: {alert.node_id}</div>
+                </div>
+              </TableCell>
               <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
               <TableCell>{alert.category}</TableCell>
-              <TableCell>{alert.created_at}</TableCell>
+              <TableCell>
+                <div className = "flex flex-col">
+                  <div>{convertToPSTMilitaryTime(alert.created_at,'timestamp')}</div>
+                  <div className = "text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at,'date')}</div>
+                </div>
+              </TableCell>
               {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
               <TableCell>
                 <Select 
@@ -143,14 +120,6 @@ function Alerts() {
                   <option value="read">read</option>
                 </Select>
               </TableCell>
-
-              {/* <TableCell>
-                <div className="flex items-center gap-2">
-                  <Avatar src={order.event.thumbUrl} className="size-6" />
-                  <span>{order.event.name}</span>
-                </div>
-              </TableCell> */}
-              {/* <TableCell className="text-right">US{order.amount.usd}</TableCell> */}
             </TableRow>
           ))
         )}
@@ -159,31 +128,37 @@ function Alerts() {
       
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
-        {/* <Button className="-my-0.5">Create order</Button> */}
       </div>
 
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
-          <TableHeader>Id</TableHeader>
           <TableHeader>Component Name</TableHeader>
           <TableHeader>Message</TableHeader>
           <TableHeader>Category</TableHeader>
           <TableHeader>Time Stamp</TableHeader>
           <TableHeader>Status</TableHeader>
-            {/*<TableHeader className="text-right">Amount</TableHeader> */}
           </TableRow>
         </TableHead>
         <TableBody>
           {alertList.map((alert) => (
             (alert.read === 'read' && 
             <TableRow key={alert.id}>
-            <TableCell>{alert.node_id}</TableCell>
-            <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.node_name}</TableCell>
-            <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
-            <TableCell>{alert.category}</TableCell>
-            <TableCell>{alert.created_at}</TableCell>
-            {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
+              <TableCell className="whitespace-normal max-w-sm max-h-24">
+                <div className = "flex flex-col">
+                  <div>{alert.node_name}</div>
+                  <div className = "text-xs text-gray-400">ID: {alert.node_id}</div>
+                </div>
+              </TableCell>
+              <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
+              <TableCell>{alert.category}</TableCell>
+              <TableCell>
+                <div className = "flex flex-col">
+                  <div>{convertToPSTMilitaryTime(alert.created_at,'timestamp')}</div>
+                  <div className = "text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at,'date')}</div>
+                </div>
+              </TableCell>
+              {/* <TableCell className="text-zinc-500">{alert.date}</TableCell> */}
             <TableCell>
                 <Select 
                 name="status"
