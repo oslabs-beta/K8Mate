@@ -69,7 +69,9 @@ function Alerts() {
     updateAlerts(alertId, alertName, id, newStatus);
   };
 
-  const deleteAlert = async (alertId, alertName, id) => {
+  const deleteAlert = async (id, log) => {
+    console.log('READ THIS' + id, log);
+    // const newId = JSON.stringify(id)
     try {
       const response = await fetch('http://localhost:8080/alert/delete', {
         method: 'DELETE',
@@ -77,9 +79,8 @@ function Alerts() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id: alertId,
-          name: alertName,
-          db_id: id
+          id: newId,
+          log: log
         })
       });
       if (response.ok) {
@@ -206,7 +207,7 @@ function Alerts() {
                 <TableCell>
                   <Button 
                     className="text-red-500" 
-                    onClick={() => deleteAlert(alert.node_name, alert.node_id, alert.id)}
+                    onClick={() => deleteAlert(alert.id, alert.log)}
                   >
                     delete
                   </Button>
