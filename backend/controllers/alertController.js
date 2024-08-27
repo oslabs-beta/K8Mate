@@ -10,8 +10,6 @@ alertController.createAlert = (req, res, next) => {
   const values = [category, id, name, log];
   const qstring = `INSERT INTO alerts (category, node_id, node_name, log)
                   VALUES ($1, $2, $3, $4)`;
-
-  console.log(values);
   db.query(qstring, values)
     .then((data) => {
       console.log('went through');
@@ -29,7 +27,6 @@ alertController.getAlert = (req, res, next) => {
 
   db.query(qstring)
     .then((data) => {
-      console.log(data.rows);
       res.locals.alerts = data.rows;
       return next();
     })
@@ -45,8 +42,6 @@ alertController.updateAlert = (req, res, next) => {
 
   db.query(qstring, values)
     .then((data) => {
-      console.log('updated successfully');
-      console.log(data);
       res.locals.alert = data;
       return next();
     })

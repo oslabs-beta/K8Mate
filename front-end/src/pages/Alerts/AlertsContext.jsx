@@ -20,7 +20,7 @@ const AlertsProvider = ({ children }) => {
         },
         body: JSON.stringify({
           category: 'CPU',
-          log: `CPU usage is high: ${cpuUsageValue}%`
+          log: `CPU usage is high: ${cpuUsageValue}%`,
         })
       });
       if (response.ok){
