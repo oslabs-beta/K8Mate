@@ -1,6 +1,6 @@
 'use client'
 import { Avatar } from './template/avatar'
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 
 import {
@@ -52,8 +52,17 @@ import {
 } from '@heroicons/react/20/solid'
 import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
+import { Alert } from './custom/Alert/Alert'
+import { AlertsContext } from '../pages/Alerts/AlertsContext'
+
+
 
 export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
+
+  const { alertsUnreadStatus } = useContext(AlertsContext);
+
+  console.log('alertsUnreadStatus', alertsUnreadStatus)
+
   return (
     <SidebarLayout
       sidebar={
@@ -75,8 +84,21 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
               <SidebarItem as={NavLink} to="/alerts" current={useLocation().pathname === "/alerts"} 
               onClick={() => setShowSidebar(false)}
               >
-                <BellAlertIcon />
-                <SidebarLabel>Alerts</SidebarLabel>
+                
+                <BellAlertIcon/>
+              
+                {alertsUnreadStatus ?
+                  <SidebarLabel className = 'flex w-full justify-between items-center text-red-500 font-semibold'>
+                    Alerts
+                    <span className="flex items-center h-2 w-2 bg-red-500 rounded-full" />
+                  </SidebarLabel> 
+                  : 
+                  <SidebarLabel>
+                    Alerts
+                
+                  </SidebarLabel> 
+                }
+                
               </SidebarItem>
               <SidebarItem as={NavLink} to="/tree"  current={useLocation().pathname === "/tree"} 
               onClick={() => setShowSidebar(false)}
@@ -96,6 +118,7 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
 
 
             </SidebarSection>
+          
             <SidebarSpacer />
 
             <SidebarSection>

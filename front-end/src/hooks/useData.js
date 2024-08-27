@@ -24,7 +24,6 @@ export function convertToPSTMilitaryTime(utcTimestamp, request) {
     if (request === 'timestamp') {
         return `${pstTime}`
     }
-     
 }
 
 export function findDate(utcTimestamp) {

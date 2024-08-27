@@ -7,20 +7,30 @@ const AlertsProvider = ({ children }) => {
   const [ runningPods, setRunningPods ] = useState(null);
   const [ podDetails, setPodDetails] = useState([]); //array of pod names to compare
   const [ prevPodDetails, setPrevPodDetails ] = useState([]);
+  const [ alertList, setAlertList ] = useState([]);
+  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState(false)
   // const hasFetchedCpuData = useRef(false);
+
+  // Function to update alertsUnreadStatus
+  const updateAlertsUnreadStatus = (status) => {
+    setAlertsUnreadStatus(status);
+  };
+
  
   // alerts requests to backend
   //cpu POST
-  const sendCpuAlert = async (cpuUsageValue) => {
+  const sendCpuAlert = async (cpuUsageValue, nodeName) => {
     try {
-      const response = await fetch ('http://localhost:8080/alert/all', {
+      const formattedCpuUsageValue = Number(cpuUsageValue).toFixed(2);
+      const response = await fetch ('http://localhost:8080/alert/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           category: 'CPU',
-          log: `CPU usage is high: ${cpuUsageValue}%`,
+          name: nodeName,
+          log: `CPU usage is high: ${formattedCpuUsageValue}% ` + Date.now()
         })
       });
       if (response.ok){
@@ -59,6 +69,7 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
+
   //pod restart POST
   const podRestartAlert = async (restartedPod, restartedPodID) => {
     try {
@@ -85,6 +96,7 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
+
   //grab details of all current pods
   useEffect(() => {
     const pods = async () => {
@@ -107,7 +119,7 @@ const AlertsProvider = ({ children }) => {
     pods();
     const intervalID = setInterval(() => {
       pods()
-    }, 5000)
+    }, 20000)
 
     return () => clearInterval(intervalID);
   }, [])
@@ -165,9 +177,12 @@ const AlertsProvider = ({ children }) => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
         const data = await response.json();
-        
-        const cpuUsagePerNode = data.data.result.map((cpuUse) => cpuUse.value[1]);
-        // console.log(cpuUsagePerNode);
+        console.log('DATA', data);
+        const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
+          nodeName: cpuUse.metric.nodename,
+          cpuUsage: cpuUse.value[1],
+        }))
+        console.log(cpuUsagePerNode);
 
         setCpuData(cpuUsagePerNode);
        
@@ -188,10 +203,10 @@ const AlertsProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const cpuThreshold = 80;
+    const cpuThreshold = 60;
     cpuData.forEach(cpuValue => {
-      if (cpuValue > cpuThreshold) {
-        alert('CPU too high!')
+      if (cpuValue.cpuUsage > cpuThreshold) {
+        sendCpuAlert(cpuValue.cpuUsage, cpuValue.nodeName)
       }
     })
   }, [cpuData])
@@ -212,16 +227,48 @@ const AlertsProvider = ({ children }) => {
     runningPods();
   }, [])
 
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try{
+        const response = await fetch('http://localhost:8080/alert/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        if (response.ok) {
+          const alerts = await response.json()
+          const hasReadTrue = alerts.some(alert => alert.read ==='unread')
+
+          if (hasReadTrue) {
+            setAlertsUnreadStatus(hasReadTrue)
+          } else {
+            setAlertsUnreadStatus(false)
+          }
+        }
+      } catch(err) {
+        console.log(err);
+      }
+    }
+    fetchAlerts();
+  }, [])
+
+
   const contextValue = {
     cpuData,
     runningPods,
     podDetails,
+    alertList,
+    alertsUnreadStatus,
+    updateAlertsUnreadStatus,  // Passing the update function through context
   };
+
   return (
     <AlertsContext.Provider value={contextValue}>
       {children}
     </AlertsContext.Provider>
   );
+
 }
 
 export { AlertsProvider, AlertsContext };

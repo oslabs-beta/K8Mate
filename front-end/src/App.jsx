@@ -15,10 +15,10 @@ import Flow from './pages/Flow/Flow';
 import { ApplicationLayout } from './components/application-layout'
 
 
-function App() {
+function App(props) {
   const [showSidebar, setShowSidebar] = useState(false);
 
-
+  console.log(props)
   // Helper function to wrap a component with ApplicationLayout
   const withLayout = (Component) => {
     return (
