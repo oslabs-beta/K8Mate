@@ -6,12 +6,16 @@ import { Heading, Subheading } from '../../components/template/heading';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/table';
 import { Select } from '../../components/template/select';
 
-import { convertToPSTMilitaryTime } from '../../hooks/useData.js';
+import { convertToMilitaryTime } from '../../hooks/useData.js';
 
 import { AlertsContext } from './AlertsContext'
+import { SettingsContext } from '../../contexts/SettingsContext'
 
 
 function Alerts() {
+
+  const {timezone} = useContext(SettingsContext)
+
   const [alertList, setAlertList] = useState([]);
   const [newReadStatus, setReadStatus] = useState('');
   // filter search state
@@ -22,7 +26,6 @@ function Alerts() {
     updateAlertsUnreadStatus,
   } = useContext(AlertsContext);
 
-  
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
@@ -34,7 +37,7 @@ function Alerts() {
         });
         if (response.ok) {
           const alerts = await response.json();
-          updateAlertsUnreadStatus(alerts.some(alert => alert.read ==='unread'))
+          updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
           setAlertList(alerts);
         }
       } catch (err) {
@@ -70,14 +73,34 @@ function Alerts() {
     updateAlerts(alertId, alertName, id, newStatus);
   };
 
-  // filter based on search terms
+  const deleteAlert = async (id, log) => {
+    console.log('READ THIS' + id, log);
+    // const newId = JSON.stringify(id)
+    try {
+      const response = await fetch('http://localhost:8080/alert/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: id,
+          log: log
+        })
+      });
+      if (response.ok) {
+        setAlertList(prevList => prevList.filter(alert => alert.id !== id));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const filteredAlerts = alertList.filter(alert => 
     alert.log.toLowerCase().includes(search.toLowerCase()) 
   );
 
   return (
     <>
-
       <div className="my-4">
         <input 
           type="text" 
@@ -90,7 +113,6 @@ function Alerts() {
       
       <div className="flex items-end justify-between gap-4">
         <Heading>New Alerts</Heading>
-        {/* <Button className="-my-0.5">Create order</Button> */}
       </div>
 
       <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
@@ -105,9 +127,8 @@ function Alerts() {
         </TableHead>
         <TableBody>
           {filteredAlerts.some(alert => alert.read === 'unread') ? (
-
             filteredAlerts.map((alert) => (
-              (alert.read === 'unread' &&
+              alert.read === 'unread' && (
                 <TableRow key={alert.id}>
                   <TableCell className="whitespace-normal max-w-sm max-h-24">
                     <div className="flex flex-col">
@@ -119,8 +140,8 @@ function Alerts() {
                   <TableCell>{alert.category}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <div>{convertToPSTMilitaryTime(alert.created_at, 'timestamp')}</div>
-                      <div className="text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at, 'date')}</div>
+                      <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
+                      <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -135,9 +156,9 @@ function Alerts() {
                     </Select>
                   </TableCell>
                 </TableRow>
-              ))
-            )
-          ):(
+              )
+            ))
+          ) : (
             <p>No unread messages at this time</p>
           )}
         </TableBody>
@@ -155,11 +176,12 @@ function Alerts() {
             <TableHeader>Category</TableHeader>
             <TableHeader>Time Stamp</TableHeader>
             <TableHeader>Status</TableHeader>
+            <TableHeader></TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
           {filteredAlerts.map((alert) => (
-            (alert.read === 'read' &&
+            alert.read === 'read' && (
               <TableRow key={alert.id}>
                 <TableCell className="whitespace-normal max-w-sm max-h-24">
                   <div className="flex flex-col">
@@ -171,8 +193,8 @@ function Alerts() {
                 <TableCell>{alert.category}</TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <div>{convertToPSTMilitaryTime(alert.created_at, 'timestamp')}</div>
-                    <div className="text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at, 'date')}</div>
+                    <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
+                    <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -186,9 +208,17 @@ function Alerts() {
                     <option value="read">read</option>
                   </Select>
                 </TableCell>
+                <TableCell>
+                  <Button 
+                    className="text-red-500" 
+                    onClick={() => deleteAlert(alert.id, alert.log)}
+                  >
+                    delete
+                  </Button>
+                </TableCell>
               </TableRow>
-            ))
-          )}
+            )
+          ))}
         </TableBody>
       </Table>
     </>
