@@ -79,7 +79,7 @@ function Alerts() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id: newId,
+          id: id,
           log: log
         })
       });
