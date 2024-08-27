@@ -21,6 +21,7 @@ const AlertsProvider = ({ children }) => {
   //cpu POST
   const sendCpuAlert = async (cpuUsageValue, nodeName) => {
     try {
+      const formattedDate = new Date().toLocaleString();
       const formattedCpuUsageValue = Number(cpuUsageValue).toFixed(2);
       const response = await fetch ('http://localhost:8080/alert/create', {
         method: 'POST',
@@ -30,7 +31,7 @@ const AlertsProvider = ({ children }) => {
         body: JSON.stringify({
           category: 'CPU',
           name: nodeName,
-          log: `CPU usage is high: ${formattedCpuUsageValue}% ` + Date.now()
+          log: `CPU usage is high: ${formattedCpuUsageValue}% at ${formattedDate}`
         })
       });
       if (response.ok){
