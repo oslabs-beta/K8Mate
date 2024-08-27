@@ -14,6 +14,7 @@ const initialNodes = [
     type: 'input',
     data: { label: 'Master Node' },
     position: { x: 400, y: 5 },
+
     style: { 
       border: '2px solid #2563eb', 
       padding: 10,
@@ -108,7 +109,7 @@ function Tree() {
     }
     fetchCluster();
   }, [])
-
+  
   //setting NODES
   useEffect(() => {
     const podsNodes = k8sCluster.filter((ele) => ele.category === 'pod');
