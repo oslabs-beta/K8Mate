@@ -6,12 +6,16 @@ import { Heading, Subheading } from '../../components/template/heading';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/table';
 import { Select } from '../../components/template/select';
 
-import { convertToPSTMilitaryTime } from '../../hooks/useData.js';
+import { convertToMilitaryTime } from '../../hooks/useData.js';
 
 import { AlertsContext } from './AlertsContext'
+import { SettingsContext } from '../../contexts/SettingsContext'
 
 
 function Alerts() {
+
+  const {timezone} = useContext(SettingsContext)
+
   const [alertList, setAlertList] = useState([]);
   const [newReadStatus, setReadStatus] = useState('');
   // filter search state
@@ -119,8 +123,8 @@ function Alerts() {
                   <TableCell>{alert.category}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <div>{convertToPSTMilitaryTime(alert.created_at, 'timestamp')}</div>
-                      <div className="text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at, 'date')}</div>
+                      <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
+                      <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -171,8 +175,8 @@ function Alerts() {
                 <TableCell>{alert.category}</TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <div>{convertToPSTMilitaryTime(alert.created_at, 'timestamp')}</div>
-                    <div className="text-xs text-gray-400">{convertToPSTMilitaryTime(alert.created_at, 'date')}</div>
+                    <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
+                    <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
                   </div>
                 </TableCell>
                 <TableCell>
