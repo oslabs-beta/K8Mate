@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Tree from './pages/Tree/Tree';
 import Notfound from './pages/Notfound/Notfound';
 import Flow from './pages/Flow/Flow';
+import Settings from './pages/Settings/Settings';
 
 import { ApplicationLayout } from './components/application-layout'
 
@@ -36,6 +37,7 @@ function App(props) {
         <Route path="/alerts" element={withLayout(Alerts)} />
         <Route path="/dashboard" element={withLayout(Dashboard)} />
         <Route path="/tree" element={withLayout(Tree)} />
+        <Route path="/settings" element={withLayout(Settings)} />
 
         {/* TO BE REMOVED */}
         <Route path="/flow" element={withLayout(Flow)} />

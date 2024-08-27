@@ -115,6 +115,14 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 <SidebarLabel>ReactFlowTest</SidebarLabel>
               </SidebarItem>
 
+              <SidebarItem as={NavLink} to="/settings"  current={useLocation().pathname === "/settings"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <Cog6ToothIcon />
+                <SidebarLabel>Settings</SidebarLabel>
+              </SidebarItem>
+
+
 
 
             </SidebarSection>
