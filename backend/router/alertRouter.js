@@ -24,5 +24,12 @@ router.put('/update',
   }
 )
 
+router.delete('/delete',
+  alertController.deleteAlert,
+  (req, res) => {
+    return res.status(200).json(res.locals);
+  }
+)
+
 
 module.exports = router;

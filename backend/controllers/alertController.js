@@ -36,9 +36,9 @@ alertController.getAlert = (req, res, next) => {
 }
 
 alertController.updateAlert = (req, res, next) => {
-  const {id, name, status, db_id} = req.body;
-  const values = [id, name, status, db_id]
-  const qstring = `UPDATE alerts SET read = $3 WHERE (node_id = $1 AND node_name = $2 AND id = $4)`;
+  const {name, status, db_id} = req.body;
+  const values = [name, status, db_id]
+  const qstring = `UPDATE alerts SET read = $2 WHERE (node_name = $1 AND id = $3)`;
 
   db.query(qstring, values)
     .then((data) => {
@@ -50,4 +50,18 @@ alertController.updateAlert = (req, res, next) => {
     })
 }
 
+alertController.deleteAlert = (req, res, next) => {
+  const {id, log} = req.body;
+  const values = [id, log]
+  const qstring = `DELETE FROM alerts WHERE (id = $1 AND log = $2)`;
+
+  db.query(qstring, values)
+    .then((data) => {
+      res.locals.alert = data;
+      return next();
+    })
+    .catch((err) => {
+      return next(err);
+    })
+}
 module.exports = alertController;

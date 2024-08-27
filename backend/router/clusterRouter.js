@@ -4,15 +4,16 @@ const router = express.Router();
 const clusterController = require('../controllers/clusterController');
 const k8sController = require('../controllers/k8sController');
 
-router.get('/',
+router.get('/all',
+  clusterController.getAll,
   (req, res) => {
-    return res.status(200).json('hello there');
+    return res.status(200).json(res.locals.cluster);
   }
 )
 
 router.post('/postPods',
   k8sController.getPods,
-  //clusterController.postObject,
+  clusterController.postPods,
   (req, res) => {
     return res.status(200).json(res.locals.pods);
   }
@@ -20,7 +21,7 @@ router.post('/postPods',
 
 router.post('/postNodes',
   k8sController.getNodes,
-  //clusterController.postObject,
+  clusterController.postNodes,
   (req, res) => {
     return res.status(200).json(res.locals.nodes);
   }
@@ -28,7 +29,7 @@ router.post('/postNodes',
 
 router.post('/postServices',
   k8sController.getServices,
-  //clusterController.postObject,
+  clusterController.postServices,
   (req, res) => {
     return res.status(200).json(res.locals.services);
   }
