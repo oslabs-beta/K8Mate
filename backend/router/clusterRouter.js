@@ -11,6 +11,20 @@ router.get('/all',
   }
 )
 
+router.get('/refresh',
+  clusterController.deleteRows,
+  k8sController.getPods,
+  k8sController.getNodes,
+  k8sController.getServices,
+  clusterController.postPods,
+  clusterController.postNodes,
+  clusterController.postServices,
+  clusterController.getAll,
+  (req, res) => {
+    return res.status(200).json(res.locals.cluster);
+  }
+)
+
 router.post('/postPods',
   k8sController.getPods,
   clusterController.postPods,
