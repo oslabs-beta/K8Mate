@@ -67,6 +67,17 @@ clusterController.postServices = async (req, res, next) => {
   }
 }
 
+clusterController.deleteRows = async (req, res, next) => {
+  try {
+    db.query(`DELETE FROM cluster`)
+    .then(() => {
+      return next();
+    })
+  } catch (err) {
+    return next(err);
+  }
+}
+
 
 clusterController.getAll = (req, res, next) => {
   try {
