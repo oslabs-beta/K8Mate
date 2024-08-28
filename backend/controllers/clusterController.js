@@ -67,7 +67,7 @@ clusterController.postServices = async (req, res, next) => {
   }
 }
 
-k8sController.deleteRows = async (req, res, next) => {
+clusterController.deleteRows = async (req, res, next) => {
   try {
     db.query(`DELETE FROM cluster`)
     .then(() => {
