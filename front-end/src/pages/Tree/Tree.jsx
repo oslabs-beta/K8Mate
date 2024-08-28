@@ -93,7 +93,7 @@ function Tree() {
   useEffect(() => {
     const fetchCluster = async () => {
       try {
-        const response = await fetch('http://localhost:8080/cluster/all', {
+        const response = await fetch('http://localhost:8080/cluster/refresh', {
           headers: {
             'Content-Type': 'application/json'
           }
