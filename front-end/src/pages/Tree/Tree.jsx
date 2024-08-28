@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { Button } from "../../components/template/button";
 import { 
   ReactFlow, 
   Controls, 
@@ -93,7 +94,7 @@ function Tree() {
   useEffect(() => {
     const fetchCluster = async () => {
       try {
-        const response = await fetch('http://localhost:8080/cluster/refresh', {
+        const response = await fetch('http://localhost:8080/cluster/all', {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -109,6 +110,22 @@ function Tree() {
     }
     fetchCluster();
   }, [])
+
+  const handleRefresh = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/cluster/refresh', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if (response.ok) {
+        const refreshedCluster = await response.json();
+        setK8sCluster(refreshedCluster)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
   
   //setting NODES
   useEffect(() => {
@@ -140,7 +157,7 @@ function Tree() {
         border: '2px solid #2563eb', 
         padding: 10,
         width: 300,
-        height: 600,
+        height: 100,
         backgroundColor: 'rgba(255, 165, 0, 0.2)',
         color: 'white',
         fontSize: 15,
@@ -148,13 +165,46 @@ function Tree() {
       },
     }));
 
-    const podsForFlow = k8sPodsList.map((pod, index) => ({
-      id: pod.name,
-      data: { label: `Pod: ${pod.name}`},
-      position: { x: -300, y: yCoordinatesCalc(index)},
-      // extent: 'parent',
-      style: { border: '1px solid black', padding: 10, fontSize: 7 },
-    }));
+    // const podsForFlow = k8sPodsList.map((pod, index) => {
+    //   const workerNodeIndex = k8sNodesList.findIndex(node => node.name === pod.data.nodeName);
+    //   return {
+    //     id: pod.name,
+    //     data: { label: `Pod: ${pod.name}`},
+    //     position: { 
+    //       x: xCoordinatesCalc(workerNodeIndex), 
+    //       y: 600 + (index * 40) 
+    //     },
+    //     style: { border: '1px solid black', padding: 10, fontSize: 7 },
+    //   };
+    // });
+
+    const groupedPodsCache = {};
+
+    k8sNodesList.forEach((workerNode) => {
+      const workerNodeName = workerNode.name;
+      if (!groupedPodsCache[workerNodeName]) {
+        groupedPodsCache[workerNodeName] = [];
+      } 
+      groupedPodsCache[workerNodeName] = k8sPodsList.filter((pod) => pod.data.nodeName === workerNodeName)
+    })
+
+    const podsForFlow = [];
+  
+    //positioning calculator based on indexes and grouped pods
+    Object.keys(groupedPodsCache).forEach((nodeName, nodeIndex) => {
+      console.log('NODEEEE', [nodeName, nodeIndex])
+      groupedPodsCache[nodeName].forEach((pod, podIndex) => {
+        const xPosition = nodeIndex * 400 + 70;  
+        const yPosition = 650 + podIndex * 50;
+  
+        podsForFlow.push({
+          id: pod.name,
+          data: { label: `Pod: ${pod.name}`},
+          position: { x: xPosition, y: yPosition },
+          style: { border: '1px solid black', padding: 10, fontSize: 7 },
+        });
+      });
+    });
 
     const servicesForFlow = k8sServicesList.map((service, index) => ({
       id: `service-${index}`,
@@ -175,13 +225,15 @@ function Tree() {
       source: 'master-node',
       // target: `worker-node-${index}`
       target: node.name,
-    }))
+    }));
 
     const workerNodeToPods = k8sPodsList.map((pod, index) => ({
       id: `el3-${index}`,
       source: pod.data.nodeName,
       target: pod.name,
-    }))
+    }));
+
+    // const workerNodeToServices = k8sServicesList
 
     // setEdges(prev => [...prev, ...masterNodeToWorkerNodes])
     setEdges(prev => {
@@ -221,6 +273,7 @@ function Tree() {
       <Background />
       <Controls />
     </ReactFlow>
+    <Button onClick={handleRefresh}>Refresh</Button>
   </div>
   </>
   )
