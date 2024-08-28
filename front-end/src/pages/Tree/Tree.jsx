@@ -132,7 +132,8 @@ function Tree() {
     }
 
     const nodesForFlow = k8sNodesList.map((node, index) => ({
-      id: `worker-node-${index}`,
+      // id: `worker-node-${index}`,
+      id: node.name,
       data: { label: `Worker Node: ${node.name}` },
       position: { x: xCoordinatesCalc(index), y: 400},
       style: { 
@@ -148,7 +149,7 @@ function Tree() {
     }));
 
     const podsForFlow = k8sPodsList.map((pod, index) => ({
-      id: `pod-${index}`,
+      id: pod.name,
       data: { label: `Pod: ${pod.name}`},
       position: { x: -300, y: yCoordinatesCalc(index)},
       // extent: 'parent',
@@ -172,15 +173,25 @@ function Tree() {
     const masterNodeToWorkerNodes = k8sNodesList.map((node, index) => ({
       id: `el2-${index}`,
       source: 'master-node',
-      target: `worker-node-${index}`
+      // target: `worker-node-${index}`
+      target: node.name,
+    }))
+
+    const workerNodeToPods = k8sPodsList.map((pod, index) => ({
+      id: `el3-${index}`,
+      source: pod.data.nodeName,
+      target: pod.name,
     }))
 
     // setEdges(prev => [...prev, ...masterNodeToWorkerNodes])
     setEdges(prev => {
-      const newEdges = masterNodeToWorkerNodes.filter(
+      const newWorkerEdges = masterNodeToWorkerNodes.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
       );
-      return [...prev, ...newEdges]
+      const newPodEdges = workerNodeToPods.filter(
+        (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
+      )
+      return [...prev, ...newWorkerEdges, ...newPodEdges]
     })
     console.log(edges)
   }, [k8sCluster])
