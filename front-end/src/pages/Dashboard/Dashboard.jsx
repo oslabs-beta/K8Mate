@@ -28,7 +28,7 @@
             onError={handleIframeError}
           ></iframe>
           <iframe
-            src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=75"
+            src="http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=78"
             onError={handleIframeError}
           ></iframe>
         </DashboardRow>
@@ -56,8 +56,18 @@
             onError={handleIframeError}
           ></iframe>
         </DashboardRow>
+        <DashboardRow colsSmall={1} colsLarge={2}>
+         <iframe src = "http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&orgId=1&refresh=5s&panelId=44"
+         onError={handleIframeError}
+         ></iframe>
+         <iframe src = "http://localhost:3000/d-solo/PwMJtdvnz/1-k8s-for-prometheus-dashboard-20211010-en?orgId=1&refresh=5s&panelId=75"
+         onError={handleIframeError}
+         ></iframe>
+
+        </DashboardRow>
       </div>
     );
   }
 
   export default Dashboard
+

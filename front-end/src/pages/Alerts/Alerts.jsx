@@ -8,23 +8,27 @@ import { Select } from '../../components/template/select';
 
 import { convertToMilitaryTime } from '../../hooks/useData.js';
 
-import { AlertsContext } from './AlertsContext'
-import { SettingsContext } from '../../contexts/SettingsContext'
-
+import { AlertsContext } from './AlertsContext';
+import { SettingsContext } from '../../contexts/SettingsContext';
 
 function Alerts() {
 
-  const {timezone} = useContext(SettingsContext)
+  const { timezone } = useContext(SettingsContext);
 
   const [alertList, setAlertList] = useState([]);
   const [newReadStatus, setReadStatus] = useState('');
-  // filter search state
   const [search, setSearch] = useState('');
 
   const { 
     alertsUnreadStatus,
     updateAlertsUnreadStatus,
   } = useContext(AlertsContext);
+
+
+  // pagination states
+  const [newAlertsPage, setNewAlertsPage] = useState(1);
+  const [resolvedAlertsPage, setResolvedAlertsPage] = useState(1);
+  const alertsPerPage = 5; 
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -67,14 +71,12 @@ function Alerts() {
     }
   };
 
-  const handleChange = (event,alertName, id) => {
+  const handleChange = (event, alertName, id) => {
     const newStatus = event.target.value;
     updateAlerts(alertName, id, newStatus);
   };
 
   const deleteAlert = async (id, log) => {
-    console.log('READ THIS' + id, log);
-    // const newId = JSON.stringify(id)
     try {
       const response = await fetch('http://localhost:8080/alert/delete', {
         method: 'DELETE',
@@ -95,8 +97,42 @@ function Alerts() {
   };
 
   const filteredAlerts = alertList.filter(alert => 
-    alert.log.toLowerCase().includes(search.toLowerCase()) 
+    alert.log.toLowerCase().includes(search.toLowerCase())
   ).reverse();
+
+// separate alerts based on status
+  const newAlerts = filteredAlerts.filter(alert => alert.read === 'unread');
+  const resolvedAlerts = filteredAlerts.filter(alert => alert.read === 'read');
+
+// pagination for new alerts
+  const indexOfLastNewAlert = newAlertsPage * alertsPerPage;
+  const indexOfFirstNewAlert = indexOfLastNewAlert - alertsPerPage;
+  const currentNewAlerts = newAlerts.slice(indexOfFirstNewAlert, indexOfLastNewAlert);
+  const totalNewAlertsPages = Math.ceil(newAlerts.length / alertsPerPage);
+
+// pagination for resolved alerts
+  const indexOfLastResolvedAlert = resolvedAlertsPage * alertsPerPage;
+  const indexOfFirstResolvedAlert = indexOfLastResolvedAlert - alertsPerPage;
+  const currentResolvedAlerts = resolvedAlerts.slice(indexOfFirstResolvedAlert, indexOfLastResolvedAlert);
+  const totalResolvedAlertsPages = Math.ceil(resolvedAlerts.length / alertsPerPage);
+
+
+
+  const handleNextNewAlertsPage = () => {
+    setNewAlertsPage(prevPage => (prevPage < totalNewAlertsPages ? prevPage + 1 : prevPage));
+  };
+
+  const handlePreviousNewAlertsPage = () => {
+    setNewAlertsPage(prevPage => (prevPage > 1 ? prevPage - 1 : prevPage));
+  };
+
+  const handleNextResolvedAlertsPage = () => {
+    setResolvedAlertsPage(prevPage => (prevPage < totalResolvedAlertsPages ? prevPage + 1 : prevPage));
+  };
+
+  const handlePreviousResolvedAlertsPage = () => {
+    setResolvedAlertsPage(prevPage => (prevPage > 1 ? prevPage - 1 : prevPage));
+  };
 
   return (
     <>
@@ -125,43 +161,61 @@ function Alerts() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredAlerts.some(alert => alert.read === 'unread') ? (
-            filteredAlerts.map((alert) => (
-              alert.read === 'unread' && (
-                <TableRow key={alert.id}>
-                  <TableCell className="whitespace-normal max-w-sm max-h-24">
-                    <div className="flex flex-col">
-                      <div>{alert.node_name}</div>
-                      <div className="text-xs text-gray-400">ID: {alert.node_id}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
-                  <TableCell>{alert.category}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
-                      <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      name="status"
-                      value={alert.read}
-                      onChange={(event) => {
-                        handleChange(event, alert.node_name, alert.id);
-                      }}>
-                      <option value="unread">unread</option>
-                      <option value="read">read</option>
-                    </Select>
-                  </TableCell>
-                </TableRow>
-              )
+          {currentNewAlerts.length > 0 ? (
+            currentNewAlerts.map((alert) => (
+              <TableRow key={alert.id}>
+                <TableCell className="whitespace-normal max-w-sm max-h-24">
+                  <div className="flex flex-col">
+                    <div>{alert.node_name}</div>
+                    <div className="text-xs text-gray-400">ID: {alert.node_id}</div>
+                  </div>
+                </TableCell>
+                <TableCell className="whitespace-normal max-w-sm max-h-24">{alert.log}</TableCell>
+                <TableCell>{alert.category}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <div>{convertToMilitaryTime(alert.created_at, timezone,'timestamp')}</div>
+                    <div className="text-xs text-gray-400">{convertToMilitaryTime(alert.created_at, timezone, 'date')}</div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    name="status"
+                    value={alert.read}
+                    onChange={(event) => {
+                      handleChange(event, alert.node_name, alert.id);
+                    }}>
+                    <option value="unread">unread</option>
+                    <option value="read">read</option>
+                  </Select>
+                </TableCell>
+              </TableRow>
             ))
           ) : (
             <p>No unread messages at this time</p>
           )}
         </TableBody>
       </Table>
+
+      <div className="flex justify-between items-center my-4">
+        <Button 
+          onClick={handlePreviousNewAlertsPage} 
+          disabled={newAlertsPage === 1} 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Previous
+        </Button>
+        <span className="text-gray-700 text-lg">
+          Page <strong>{newAlertsPage}</strong> of <strong>{totalNewAlertsPages}</strong>
+        </span>
+        <Button 
+          onClick={handleNextNewAlertsPage} 
+          disabled={newAlertsPage === totalNewAlertsPages} 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Next
+        </Button>
+      </div>
 
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
@@ -179,8 +233,8 @@ function Alerts() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredAlerts.map((alert) => (
-            alert.read === 'read' && (
+          {currentResolvedAlerts.length > 0 ? (
+            currentResolvedAlerts.map((alert) => (
               <TableRow key={alert.id}>
                 <TableCell className="whitespace-normal max-w-sm max-h-24">
                   <div className="flex flex-col">
@@ -216,10 +270,32 @@ function Alerts() {
                   </Button>
                 </TableCell>
               </TableRow>
-            )
-          ))}
+            ))
+          ) : (
+            <p>No resolved messages at this time</p>
+          )}
         </TableBody>
       </Table>
+
+      <div className="flex justify-between items-center my-4">
+        <Button 
+          onClick={handlePreviousResolvedAlertsPage} 
+          disabled={resolvedAlertsPage === 1} 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Previous
+        </Button>
+        <span className="text-gray-700 text-lg">
+          Page <strong>{resolvedAlertsPage}</strong> of <strong>{totalResolvedAlertsPages}</strong>
+        </span>
+        <Button 
+          onClick={handleNextResolvedAlertsPage} 
+          disabled={resolvedAlertsPage === totalResolvedAlertsPages} 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Next
+        </Button>
+      </div>
     </>
   );
 }
