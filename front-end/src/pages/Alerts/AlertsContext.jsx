@@ -3,6 +3,8 @@ import react, { createContext, useState, useEffect, useRef } from 'react';
 const AlertsContext = createContext();
 
 const AlertsProvider = ({ children }) => {
+  const [ networkTraffic, setNetworkTraffic ] = useState([])
+  const [ diskSpace, setDiskSpace ] = useState([])
   const [ cpuData, setCpuData ] = useState([]);
   const [ runningPods, setRunningPods ] = useState(null);
   const [ podDetails, setPodDetails] = useState([]); //array of pod names to compare
@@ -19,6 +21,9 @@ const AlertsProvider = ({ children }) => {
  
   // alerts requests to backend
   //cpu POST
+
+
+
   const sendCpuAlert = async (cpuUsageValue, nodeName) => {
     try {
       const formattedDate = new Date().toLocaleString();
@@ -84,7 +89,7 @@ const AlertsProvider = ({ children }) => {
           id: restartedPodID,
           category: 'Pod',
           name: restartedPod,
-          log: `${restartedPod} has restarted`,
+          log: `${restartedPod} has started`,
         })
       });
       if (response.ok){
@@ -155,21 +160,125 @@ const AlertsProvider = ({ children }) => {
     setPrevPodDetails(podDetails);
   }, [podDetails])
 
-
-  //node sessions 
+  // network traffic
   useEffect(() => {
-    const nodeSessions = async () => {
+    const networkTrafficData = async () => {
       try {
-      const response = await fetch('http://localhost:9090/api/v1/query?query=count(kube_node_info)')
-      const data = await response.json();
-      console.log('node sessions', data)
+        const query = encodeURIComponent('(irate(node_network_receive_bytes_total[1m]) + irate(node_network_transmit_bytes_total[1m]))');
+        const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data.result.length > 0) {
+          const trafficData = data.data.result.map(result => ({
+            nodeName: result.metric.instance,
+            bitsPerSecond: parseFloat(result.value[1]) * 8 
+          }));
+          setNetworkTraffic(trafficData);
+        } else {
+          console.log('No data available or query failed.');
+        }
+      } catch (err) {
+        console.log('Error fetching network traffic data:', err);
       }
-      catch(err) {
-        console.log(err)
+    };
+  
+    networkTrafficData();
+    const intervalID = setInterval(networkTrafficData, 5000);
+    return () => clearInterval(intervalID);
+  }, []);
+  
+  useEffect(() => {
+    const trafficThreshold = 1000000000; // 1 gbps threshold
+    networkTraffic.forEach(traffic => {
+      if (traffic.bitsPerSecond > trafficThreshold) {
+        sendNetworkTrafficAlert(traffic.bitsPerSecond, traffic.nodeName);
       }
+    });
+  }, [networkTraffic]);
+  
+  const sendNetworkTrafficAlert = async (bitsPerSecond, nodeName) => {
+    try {
+      const formattedDate = new Date().toLocaleString();
+      const formattedBitsRate = Number(bitsPerSecond).toFixed(2);
+      const response = await fetch('http://localhost:8080/alert/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          category: 'Nodes',
+          name: nodeName,
+          log: `High network traffic detected at ${formattedBitsRate} bits per second on ${nodeName} on ${formattedDate}`
+        })
+      });
+      if (response.ok) {
+        console.log('Network traffic alert was sent successfully');
+      } else {
+        console.log('Network traffic alert failed to send');
+      }
+    } catch (err) {
+      console.log(err);
     }
-    nodeSessions();
-  }, [])
+  };
+
+
+ // lowDiskSpaace
+
+  useEffect(() => {
+    const lowDiskSpace = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/query?query=100*(1-(node_filesystem_avail_bytes/node_filesystem_size_bytes))');
+        const data = await response.json();
+        console.log('DISK SPACE ALERT:', data);
+            const diskData = data.data.result.map((disk) => ({
+              nodeName: disk.metric.instance,
+              diskNum: disk.value[1]
+            }))
+            // console.log('HER EHERE HERE HERE' + diskData)
+            setDiskSpace(diskData)
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    lowDiskSpace();
+    const intervalID = setInterval(lowDiskSpace, 5000);
+    return () => clearInterval(intervalID);
+  }, []);
+
+  useEffect(() => {
+    const diskSpacePercentage = 85;
+    diskSpace.forEach(diskValue => {
+      if (diskValue.diskNum > diskSpacePercentage) {
+        sendDiskValueAlert(diskValue.diskNum, diskValue.nodeName)
+      }
+    })
+  }, [diskSpace])
+
+  const sendDiskValueAlert = async (diskSpaceNum, nodeName) => {
+    try {
+      const formattedDate = new Date().toLocaleString();
+      const formattedDiskSpace = Number(diskSpaceNum).toFixed(2);
+      const response = await fetch ('http://localhost:8080/alert/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          category: 'Disk',
+          name: nodeName,
+          log: `Disk space usage is high at ${formattedDiskSpace}% on ${nodeName} on ${formattedDate}`
+        })
+      });
+      if (response.ok){
+        console.log('Disk Space alert was sent successfully');
+      } else {
+        console.log('Disk Space alert failed to send');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
 
   // grab CPU usage per node
 
@@ -178,15 +287,13 @@ const AlertsProvider = ({ children }) => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
         const data = await response.json();
-        console.log('DATA', data);
+        // console.log('DATA', data);
         const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
-          nodeName: cpuUse.metric.nodename,
+          nodeName: cpuUse.metric.instance,
           cpuUsage: cpuUse.value[1],
         }))
-        console.log(cpuUsagePerNode);
-
+        // console.log("THIS THIS THIS " + cpuUsagePerNode);
         setCpuData(cpuUsagePerNode);
-       
       } catch (err) {
         console.log(err);
       }
@@ -195,11 +302,9 @@ const AlertsProvider = ({ children }) => {
     //   cpuUsage();
     //   hasFetchedCpuData.current = true;
     // }
-
     const intervalID = setInterval(() => {
       cpuUsage()
     }, 5000)
-
     return () => clearInterval(intervalID);
   }, []);
 
@@ -213,20 +318,6 @@ const AlertsProvider = ({ children }) => {
   }, [cpuData])
  
   // grab number of running pods
-  useEffect(() => {
-    const runningPods = async () => {
-      try {
-        const response = await fetch('http://localhost:9090/api/v1/query?query=count(kube_pod_status_phase{phase="Running"})');
-        const data = await response.json();
-        console.log('number of running pods', data);
-        setRunningPods(data.data.result[0].value[1]);
-      }
-      catch(err){
-        console.log(err)
-      }
-    }
-    runningPods();
-  }, [])
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -256,6 +347,7 @@ const AlertsProvider = ({ children }) => {
 
 
   const contextValue = {
+    diskSpace,
     cpuData,
     runningPods,
     podDetails,
