@@ -201,11 +201,11 @@ export function SecondaryFeatures({features, header, subheader, subheaderInclude
     >
       <Container>
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-3xl font-medium tracking-tight text-gray-900">
+          <h2 className="text-3xl font-medium tracking-tight text-gray-900 dark:text-gray-100">
             {header ? header : `Now is the time to build your portfolio.`}
           </h2>
           {subheaderInclude && 
-            <p className="mt-2 text-lg text-gray-600">
+            <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
               {subheader ? subheader : `
               With typical market returns, you have to start young to secure your
               future. With Pocket, it’s never too late to build your nest egg.`}
@@ -223,10 +223,10 @@ export function SecondaryFeatures({features, header, subheader, subheaderInclude
             >
               {/* <feature.icon className="h-8 w-8" /> */}
               {feature.icon}
-              <h3 className="mt-6 font-bold text-lg text-gray-900">
+              <h3 className="mt-6 font-bold text-lg text-gray-900 dark:text-gray-100">
                 {feature.name}
               </h3>
-              <p className="mt-2 text-gray-700">{feature.description}</p>
+              <p className="mt-2 text-gray-700 dark:text-gray-400">{feature.description}</p>
               <Link to={feature.link}> 
                 <Button className="mt-6" color="superPurple" onClick={console.log('LINK',feature.link)}>{feature.cta}</Button>
               </Link>

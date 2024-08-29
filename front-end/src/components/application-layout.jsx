@@ -54,6 +54,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink
 
 import { Alert } from './custom/Alert/Alert'
 import { AlertsContext } from '../pages/Alerts/AlertsContext'
+import { Logo } from './custom/Logo/Logo.jsx'
 
 
 
@@ -69,7 +70,7 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
         <Sidebar>
           <SidebarHeader>
             <SidebarItem style={{ pointerEvents: 'none', cursor: 'default' }}>
-              <ChartBarIcon/>
+            <Logo className ="h-6 w-6 "/>
               <SidebarLabel>Super Kuber™</SidebarLabel>
             </SidebarItem>
           </SidebarHeader>
