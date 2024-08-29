@@ -8,15 +8,15 @@ VALUES ($1, $2, $3, $4, $5)`;
 clusterController.postPods = async (req, res, next) => {
   try {
     res.locals.pods.map((podObject) => {
-      const { name, namespace, uid, creationTimestamp } = podObject.metadata;
+      const { name, namespace, uid, creationTimestamp, labels } = podObject.metadata;
       const { nodeName, containers } = podObject.spec;
-      const values = ['pod', name, uid, creationTimestamp, {namespace, nodeName, containers}];
+      const values = ['pod', name, uid, creationTimestamp, {namespace, nodeName, labels, containers}];
 
       db.query(qstring, values)
         .catch((err) => { return next(err); })
     })
 
-    return next();s
+    return next();
   }
   catch (err){
     return next(err);
@@ -54,7 +54,8 @@ clusterController.postServices = async (req, res, next) => {
   try {
     res.locals.services.map((serviceObject) => {
       const { name, namespace, uid, creationTimestamp } = serviceObject.metadata;
-      const values = ['service', name, uid, creationTimestamp, {namespace}];
+      const { selector } = serviceObject.spec;
+      const values = ['service', name, uid, creationTimestamp, {namespace, selector}];
 
       db.query(qstring, values)
         .catch((err) => { return next(err); })
@@ -63,6 +64,17 @@ clusterController.postServices = async (req, res, next) => {
     return next();
   }
   catch (err){
+    return next(err);
+  }
+}
+
+clusterController.deleteRows = async (req, res, next) => {
+  try {
+    db.query(`DELETE FROM cluster`)
+    .then(() => {
+      return next();
+    })
+  } catch (err) {
     return next(err);
   }
 }

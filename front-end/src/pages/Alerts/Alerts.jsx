@@ -47,7 +47,7 @@ function Alerts() {
     fetchAlerts();
   }, [newReadStatus]);
 
-  const updateAlerts = async (alertId, alertName, id, newStatus) => {
+  const updateAlerts = async (alertName, id, newStatus) => {
     try {
       const response = await fetch('http://localhost:8080/alert/update', {
         method: 'PUT',
@@ -55,22 +55,21 @@ function Alerts() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id: alertId,
           name: alertName,
           db_id: id,
           status: newStatus,
         }),
       });
       const data = await response.json();
-      setReadStatus([alertId, alertName, id, newStatus]);
+      setReadStatus([alertName, id, newStatus]);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handleChange = (event, alertId, alertName, id) => {
+  const handleChange = (event,alertName, id) => {
     const newStatus = event.target.value;
-    updateAlerts(alertId, alertName, id, newStatus);
+    updateAlerts(alertName, id, newStatus);
   };
 
   const deleteAlert = async (id, log) => {
@@ -97,7 +96,7 @@ function Alerts() {
 
   const filteredAlerts = alertList.filter(alert => 
     alert.log.toLowerCase().includes(search.toLowerCase()) 
-  );
+  ).reverse();
 
   return (
     <>
@@ -149,7 +148,7 @@ function Alerts() {
                       name="status"
                       value={alert.read}
                       onChange={(event) => {
-                        handleChange(event, alert.node_id, alert.node_name, alert.id);
+                        handleChange(event, alert.node_name, alert.id);
                       }}>
                       <option value="unread">unread</option>
                       <option value="read">read</option>
@@ -202,7 +201,7 @@ function Alerts() {
                     name="status"
                     value={alert.read}
                     onChange={(event) => {
-                      handleChange(event, alert.node_id, alert.node_name, alert.id);
+                      handleChange(event, alert.node_name, alert.id);
                     }}>
                     <option value="unread">unread</option>
                     <option value="read">read</option>
