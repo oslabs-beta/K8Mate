@@ -3,6 +3,7 @@ import react, { createContext, useState, useEffect, useRef } from 'react';
 const AlertsContext = createContext();
 
 const AlertsProvider = ({ children }) => {
+  const [ availableMemory, setAvailableMemory ] = useState([])
   const [ networkTraffic, setNetworkTraffic ] = useState([])
   const [ diskSpace, setDiskSpace ] = useState([])
   const [ cpuData, setCpuData ] = useState([]);
@@ -21,6 +22,62 @@ const AlertsProvider = ({ children }) => {
  
   // alerts requests to backend
   //cpu POST
+
+  useEffect(() => {
+    const availMem = async () => {
+      try {
+        const query = encodeURIComponent('node_memory_MemAvailable_bytes');
+        const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
+        const data = await response.json();
+        // console.log("READ THIS SHIT HERE", data)
+        const memData = data.data.result.map((mem) => {
+          return {
+            nodeName: mem.metric.instance,
+            memNum: mem.value[1]
+          }
+        });
+        setAvailableMemory(memData)
+      } catch(err) {
+        console.log(err)
+      }
+    }
+    availMem();
+    const intervalID = setInterval(availMem, 5000);
+    return () => clearInterval(intervalID);
+  }, [])
+
+  useEffect(() => {
+    const memoryThreshold = 1073741824; // 1gb threshold
+    availableMemory.forEach(mem => {
+      if (mem.memNum < memoryThreshold) {
+        sendAvailMemAlert(mem.memNum, mem.nodeName);
+      }
+    });
+  }, [availableMemory]);
+
+  const sendAvailMemAlert = async (memoryNumber, nodeName) => {
+    try {
+      const formattedDate = new Date().toLocaleString();
+      const response = await fetch('http://localhost:8000/alert/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          category: 'Node',
+          name: nodeName,
+          log: `Low memory detected on node ${nodeName} at ${formattedDate}. Current available memory is ${memoryNumber}.`
+        })
+      });
+      if (response.ok){
+        console.log('Memory alert sent successfully')
+      } else {
+        console.log('Memory alert failed to send')
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
 
 
@@ -160,6 +217,7 @@ const AlertsProvider = ({ children }) => {
     setPrevPodDetails(podDetails);
   }, [podDetails])
 
+
   // network traffic
   useEffect(() => {
     const networkTrafficData = async () => {
@@ -289,7 +347,7 @@ const AlertsProvider = ({ children }) => {
         const data = await response.json();
         // console.log('DATA', data);
         const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
-          nodeName: cpuUse.metric.nodename,
+          nodeName: cpuUse.metric.nodeName,
           cpuUsage: cpuUse.value[1],
         }))
         setCpuData(cpuUsagePerNode);
