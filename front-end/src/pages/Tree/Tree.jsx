@@ -128,30 +128,6 @@ function Tree() {
     }
   }
 
-  // const onNodeClick = useCallback((event, node) => {
-  //   setVisibleEdges(prevVisibleEdges => {
-  //     const newVisibleEdges = new Set(prevVisibleEdges);
-  //     edges.forEach(edge => {
-  //       if (edge.source === node.id || edge.target === node.id) {
-  //         if (newVisibleEdges.has(edge.id)) {
-  //           newVisibleEdges.delete(edge.id);
-  //         } else {
-  //           newVisibleEdges.add(edge.id);
-  //         }
-  //       }
-  //     });
-  //     return newVisibleEdges;
-  //   });
-  // }, [edges]);
-  
-  // const updatedEdges = edges.map(edge => ({
-  //   ...edge,
-  //   style: {
-  //     ...edge.style,
-  //     stroke: visibleEdges.has(edge.id) ? 'white' : 'none', // Adjust color and visibility
-  //   },
-  // }));
-
   //setting NODES
   useEffect(() => {
     const podsNodes = k8sCluster.filter((ele) => ele.category === 'pod');
@@ -169,10 +145,6 @@ function Tree() {
       return (num * 350) + 50;
     }
 
-    // const yCoordinatesCalc = (num) => {
-    //   return (num * 50)
-    // }
-
     const nodesForFlow = k8sNodesList.map((node, index) => ({
       id: node.name,
       data: { label: `Worker Node: ${node.name}` },
@@ -188,19 +160,6 @@ function Tree() {
         zIndex: -1   
       },
     }));
-
-    // const podsForFlow = k8sPodsList.map((pod, index) => {
-    //   const workerNodeIndex = k8sNodesList.findIndex(node => node.name === pod.data.nodeName);
-    //   return {
-    //     id: pod.name,
-    //     data: { label: `Pod: ${pod.name}`},
-    //     position: { 
-    //       x: xCoordinatesCalc(workerNodeIndex), 
-    //       y: 600 + (index * 40) 
-    //     },
-    //     style: { border: '1px solid black', padding: 10, fontSize: 7 },
-    //   };
-    // });
 
     const groupedPodsCache = {};
 
@@ -235,15 +194,6 @@ function Tree() {
       });
     });
 
-    // const servicesForFlow = k8sServicesList.map((service, index) => ({
-    //   // id: `service-${index}`,
-    //   id: service.name,
-    //   data: { label: `Service: ${service.name}` },
-    //   position: { x: -100, y: yCoordinatesCalc(index)},
-    //   style: { border: '1px solid black', padding: 10, fontSize: 7 },
-    // }))
-
-    // setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow, ...servicesForFlow]);
     setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow]);
 
   }, [k8sCluster])
@@ -280,7 +230,6 @@ function Tree() {
         id: `s-p-${serviceIndex}-${podIndex}`,
         source: service.name,
         target: pod.name,
-        // style: { opacity: 0 },
       }));
     });
 
@@ -326,9 +275,9 @@ function Tree() {
   );
 
   const onNodeClick = useCallback((event, node) => {
-    setVisibleEdges(prevVisibleEdges => {
+    setVisibleEdges((prevVisibleEdges) => {
       const newVisibleEdges = new Set(prevVisibleEdges);
-      edges.forEach(edge => {
+      edges.forEach((edge) => {
         if (edge.source === node.id || edge.target === node.id) {
           if (newVisibleEdges.has(edge.id)) {
             newVisibleEdges.delete(edge.id);
@@ -341,11 +290,14 @@ function Tree() {
     });
   }, [edges]);
 
-  const updatedEdges = edges.map(edge => ({
+  const updatedEdges = edges.map((edge) => ({
     ...edge,
     style: {
       ...edge.style,
-      stroke: visibleEdges.has(edge.id) ? 'white' : 'none',
+      stroke: 
+        edge.id.startsWith('s-p')
+        ? (visibleEdges.has(edge.id) ? 'white' : 'none') 
+        : 'white', 
     },
   }));
 
