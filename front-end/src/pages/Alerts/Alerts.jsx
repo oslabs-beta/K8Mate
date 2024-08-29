@@ -169,7 +169,7 @@ function Alerts() {
       <div className="flex items-end justify-between gap-4">
         <Heading>New Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -216,7 +216,7 @@ function Alerts() {
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousNewAlertsPage} 
@@ -236,11 +236,14 @@ function Alerts() {
           next
         </Button>
       </div>
-
+  
+      {/* Divider Line */}
+      <hr className="my-8 border-t-.1 border-gray-300" />
+  
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -293,11 +296,11 @@ function Alerts() {
               </TableRow>
             ))
           ) : (
-            <p>No resolved messages at this time</p>
+            <p>No resolved alerts at this time</p>
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousResolvedAlertsPage} 
