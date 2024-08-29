@@ -11,7 +11,7 @@ import {
 } from '@heroicons/react/20/solid'
 
 
-import styles from "./Dashboard.module.css";
+import styles from "./Overview.module.css";
 
 import { Hero } from '../../components/template/pocket/Hero.jsx'
 import { SecondaryFeatures } from '../../components/template/pocket/SecondaryFeatures.jsx'
@@ -34,24 +34,24 @@ function Home() {
     {
       name: 'Reports',
       description:
-        'Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
-      icon: <ChartBarIcon className="h-12 w-12 text-superPurple animate-float"/>,
+        'Monitor critical real-time metrics for the health of your app',
+      icon: <ChartBarIcon className="h-12 w-12 text-superPurple animate-float dark:text-gray-100"/>,
       cta:'See Reports',
       link:'/dashboard',
     },
     {
       name: 'Alerts',
       description:
-        'Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
-      icon: <BellAlertIcon className="h-12 w-12 text-superPurple animate-float"/>,
+        'Stay up-to-date on critical real-time changes to your cluster, nodes, and pods',
+      icon: <BellAlertIcon className="h-12 w-12 text-superPurple animate-float dark:text-gray-100"/>,
       cta:'See Alerts',
       link:'/alerts',
     },
     {
       name: 'K8 Structure',
       description:
-        'Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
-      icon: <MapIcon className="h-12 w-12 text-superPurple animate-float"/>,
+        'See the birds eye view of your cluster structure',
+      icon: <MapIcon className="h-12 w-12 text-superPurple animate-float dark:text-gray-100"/>,
       cta:'See Structure',
       link:'/tree',
     },
@@ -60,11 +60,11 @@ function Home() {
 
   return (
     
-    <div className={styles.dashboardContainer}>
+    <div className={styles.overviewContainer}>
       <Hero
         className="!pt-20 !pb-0"
-        header={``} 
-        subheader ={''} 
+        header={`Super Kuber™`} 
+        subheader ={'Supercharge Your Kubernetes'} 
       />
       <Divider className="my-10" soft />
       <SecondaryFeatures 

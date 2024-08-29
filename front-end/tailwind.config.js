@@ -65,5 +65,5 @@ module.exports = {
       },
     },
   },
-  plugins: [formsPlugin],
+  plugins: [],
 }
