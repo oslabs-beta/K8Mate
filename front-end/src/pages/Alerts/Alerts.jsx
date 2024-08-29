@@ -51,6 +51,7 @@ function Alerts() {
     fetchAlerts();
   }, [newReadStatus]);
 
+  // instnat render of alerts
   const updateAlerts = async (alertName, id, newStatus) => {
     const updatedAlerts = alertList.map(alert => {
       if (alert.id === id) {
