@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from "../../components/template/catalyst/button";
+import { Heading } from '../../components/template/catalyst/heading';
 import { 
   ReactFlow, 
   Controls, 
@@ -15,15 +16,15 @@ const initialNodes = [
     type: 'input',
     data: { label: 'Master Node' },
     position: { x: 400, y: 5 },
-
     style: { 
       border: '2px solid #2563eb', 
       padding: 10,
       width: 300,
       height: 300,
-      backgroundColor: 'rgba(37, 99, 235, 0.2)',
-      color: 'white',
-      fontSize: 15,
+      backgroundColor: 'rgba(37, 99, 235, 0.5)',
+      color: 'black',
+      fontSize: 20,
+      fontWeight: 'bold',
       zIndex: -1   
     },
   },
@@ -87,9 +88,9 @@ function Tree() {
   const [ k8sPodsList, setK8sPods ] = useState([]);
   const [ k8sNodesList, setK8sNodes ] = useState([]);
   const [ k8sServicesList, setK8sServices ] = useState([]);
-  const [ nodes, setNodes ] = useState(initialNodes);
+  const [ nodes, setNodes ] = useState([]);
   const [ edges, setEdges ] = useState(initialEdges);
-  const [visibleEdges, setVisibleEdges] = useState(new Set()); 
+  const [ visibleEdges, setVisibleEdges ] = useState(new Set()); 
   
   //grab all info regarding the cluster
   useEffect(() => {
@@ -103,6 +104,7 @@ function Tree() {
         if (response.ok) {
           const cluster = await response.json();
           console.log('CLUSTER INFO', cluster);
+          setNodes(initialNodes)
           setK8sCluster(cluster);
         }
       } catch (err) {
@@ -154,9 +156,10 @@ function Tree() {
         padding: 10,
         width: 300,
         height: 100,
-        backgroundColor: 'rgba(200, 162, 255, 0.2)',
-        color: 'white',
+        backgroundColor: 'rgba(200, 162, 255, 0.5)',
+        color: 'black',
         fontSize: 15,
+        fontWeight: 'bold',
         zIndex: -1   
       },
     }));
@@ -296,14 +299,14 @@ function Tree() {
       ...edge.style,
       stroke: 
         edge.id.startsWith('s-p')
-        ? (visibleEdges.has(edge.id) ? 'white' : 'none') 
-        : 'white', 
+        ? (visibleEdges.has(edge.id) ? 'grey' : 'none') 
+        : 'grey', 
     },
   }));
 
   return (
     <>
-    <div>Tree</div>
+    <Heading>K8s Structure</Heading>
     <div style={{ height: '1000px' }}>
     <ReactFlow
       nodes={nodes}

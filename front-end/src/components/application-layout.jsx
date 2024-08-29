@@ -114,7 +114,7 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
               onClick={() => setShowSidebar(false)}
               >
                 <MapIcon />
-                <SidebarLabel>K8 Structure</SidebarLabel>
+                <SidebarLabel>K8s Structure</SidebarLabel>
               </SidebarItem>
 
               {/* TO BE REMOVED */}
