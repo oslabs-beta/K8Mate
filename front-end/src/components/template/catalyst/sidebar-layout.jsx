@@ -48,6 +48,7 @@ export function SidebarLayout({ navbar, sidebar, children }) {
   let [showSidebar, setShowSidebar] = useState(false)
 
   return (
+    // <div className="relative isolate flex min-h-svh w-full bg-white max-lg:flex-col lg:bg-gradient-to-b from-[#e6e3fe] to-[#F9F9F9] dark:from-zinc-900 dark:to-zinc-950">
     <div className="relative isolate flex min-h-svh w-full bg-white max-lg:flex-col lg:bg-gradient-to-b from-[#e6e3fe] to-[#F9F9F9] dark:from-zinc-900 dark:to-zinc-950">
       {/* Sidebar on desktop */}
       <div className="fixed inset-y-0 left-0 w-64 max-lg:hidden">{sidebar}</div>

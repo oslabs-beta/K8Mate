@@ -350,7 +350,6 @@ const AlertsProvider = ({ children }) => {
           nodeName: cpuUse.metric.nodeName,
           cpuUsage: cpuUse.value[1],
         }))
-        // console.log("THIS THIS THIS " + cpuUsagePerNode);
         setCpuData(cpuUsagePerNode);
       } catch (err) {
         console.log(err);

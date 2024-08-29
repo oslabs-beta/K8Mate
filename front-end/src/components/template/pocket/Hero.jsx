@@ -6,13 +6,15 @@ import clsx from 'clsx'
 
 import { AppDemo } from './AppDemo'
 import { AppStoreLink } from './AppStoreLink'
-import { Button } from './Button'
+// import { Button } from './Button'
 import { Container } from './Container'
 import { PhoneFrame } from './PhoneFrame'
 
 import {
   ChartBarIcon,
 } from '@heroicons/react/20/solid'
+
+import { Logo } from '../../custom/Logo/Logo.jsx'
 
 
 function BackgroundIllustration(props) {
@@ -99,14 +101,14 @@ function PlayIcon(props) {
 
 export function Hero({className, header, subheader}) {
   return (
-    <div className={clsx("overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36", className)}>
+    <div className={clsx("overflow-hidden py-20 sm:py-32 lg:pb-32 xl:pb-36", className,"md:min-h-[300px]")}>
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
           <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
-            <h1 className="text-4xl font-medium tracking-tight text-gray-900">
+            <h1 className="text-5xl font-medium tracking-tight text-gray-900 dark:text-gray-100">
               { header ? header : 'Lorem Ipsum' }
             </h1>
-            <p className="mt-6 text-lg text-gray-600">
+            <p className="mt-6 text-2xl text-gray-600 dark:text-gray-400">
             { subheader ? subheader : 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' }
             </p>
             {/* <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
@@ -126,8 +128,9 @@ export function Hero({className, header, subheader}) {
               {/* <PhoneFrame className="mx-auto max-w-[366px]" priority>
                 <AppDemo />
               </PhoneFrame> */}
-              <ChartBarIcon className ="h-56 w-56 mx-auto max-w-[366px] text-superPurple animate-float"/>
-
+              <Logo className ="h-56 w-56 mx-auto max-w-[366px] text-superPurple animate-float"/>
+              {/* <ChartBarIcon className ="h-56 w-56 mx-auto max-w-[366px] text-superPurple animate-float"/> */}
+                
 
             </div>
           </div>
