@@ -289,10 +289,9 @@ const AlertsProvider = ({ children }) => {
         const data = await response.json();
         // console.log('DATA', data);
         const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
-          nodeName: cpuUse.metric.instance,
+          nodeName: cpuUse.metric.nodename,
           cpuUsage: cpuUse.value[1],
         }))
-        // console.log("THIS THIS THIS " + cpuUsagePerNode);
         setCpuData(cpuUsagePerNode);
       } catch (err) {
         console.log(err);
