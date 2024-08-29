@@ -89,7 +89,8 @@ function Tree() {
   const [ k8sServicesList, setK8sServices ] = useState([]);
   const [ nodes, setNodes ] = useState(initialNodes);
   const [ edges, setEdges ] = useState(initialEdges);
-
+  const [visibleEdges, setVisibleEdges] = useState(new Set()); 
+  
   //grab all info regarding the cluster
   useEffect(() => {
     const fetchCluster = async () => {
@@ -126,7 +127,31 @@ function Tree() {
       console.log(err)
     }
   }
+
+  // const onNodeClick = useCallback((event, node) => {
+  //   setVisibleEdges(prevVisibleEdges => {
+  //     const newVisibleEdges = new Set(prevVisibleEdges);
+  //     edges.forEach(edge => {
+  //       if (edge.source === node.id || edge.target === node.id) {
+  //         if (newVisibleEdges.has(edge.id)) {
+  //           newVisibleEdges.delete(edge.id);
+  //         } else {
+  //           newVisibleEdges.add(edge.id);
+  //         }
+  //       }
+  //     });
+  //     return newVisibleEdges;
+  //   });
+  // }, [edges]);
   
+  // const updatedEdges = edges.map(edge => ({
+  //   ...edge,
+  //   style: {
+  //     ...edge.style,
+  //     stroke: visibleEdges.has(edge.id) ? 'white' : 'none', // Adjust color and visibility
+  //   },
+  // }));
+
   //setting NODES
   useEffect(() => {
     const podsNodes = k8sCluster.filter((ele) => ele.category === 'pod');
@@ -144,12 +169,11 @@ function Tree() {
       return (num * 350) + 50;
     }
 
-    const yCoordinatesCalc = (num) => {
-      return (num * 50)
-    }
+    // const yCoordinatesCalc = (num) => {
+    //   return (num * 50)
+    // }
 
     const nodesForFlow = k8sNodesList.map((node, index) => ({
-      // id: `worker-node-${index}`,
       id: node.name,
       data: { label: `Worker Node: ${node.name}` },
       position: { x: xCoordinatesCalc(index), y: 400},
@@ -158,7 +182,7 @@ function Tree() {
         padding: 10,
         width: 300,
         height: 100,
-        backgroundColor: 'rgba(255, 165, 0, 0.2)',
+        backgroundColor: 'rgba(200, 162, 255, 0.2)',
         color: 'white',
         fontSize: 15,
         zIndex: -1   
@@ -195,26 +219,32 @@ function Tree() {
       console.log('NODEEEE', [nodeName, nodeIndex])
       groupedPodsCache[nodeName].forEach((pod, podIndex) => {
         const xPosition = nodeIndex * 400 + 70;  
-        const yPosition = 650 + podIndex * 50;
+        const yPosition = 650 + podIndex * 75;
   
         podsForFlow.push({
           id: pod.name,
           data: { label: `Pod: ${pod.name}`},
           position: { x: xPosition, y: yPosition },
-          style: { border: '1px solid black', padding: 10, fontSize: 7 },
+          style: { 
+            border: '1px solid black', 
+            padding: 10, 
+            fontSize: 7,
+            backgroundColor: 'green'
+           },
         });
       });
     });
 
-    const servicesForFlow = k8sServicesList.map((service, index) => ({
-      id: `service-${index}`,
-      data: { label: `Service: ${service.name}` },
-      position: { x: -100, y: yCoordinatesCalc(index)},
-      // extent: 'parent',
-      style: { border: '1px solid black', padding: 10, fontSize: 7 },
-    }))
+    // const servicesForFlow = k8sServicesList.map((service, index) => ({
+    //   // id: `service-${index}`,
+    //   id: service.name,
+    //   data: { label: `Service: ${service.name}` },
+    //   position: { x: -100, y: yCoordinatesCalc(index)},
+    //   style: { border: '1px solid black', padding: 10, fontSize: 7 },
+    // }))
 
-    setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow, ...servicesForFlow]);
+    // setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow, ...servicesForFlow]);
+    setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow]);
 
   }, [k8sCluster])
 
@@ -223,7 +253,6 @@ function Tree() {
     const masterNodeToWorkerNodes = k8sNodesList.map((node, index) => ({
       id: `el2-${index}`,
       source: 'master-node',
-      // target: `worker-node-${index}`
       target: node.name,
     }));
 
@@ -232,10 +261,43 @@ function Tree() {
       source: pod.data.nodeName,
       target: pod.name,
     }));
+    
+    const connectedServices = new Set();
 
-    // const workerNodeToServices = k8sServicesList
+    const serviceToPods = k8sServicesList.flatMap((service, serviceIndex) => {
+      if (!service.data.selector) return [];
+      const matchingPods = k8sPodsList.filter((pod) => {
+        if (!pod.data.labels) return;
+        return Object.entries(service.data.selector).every(([key, value]) => 
+          pod.data.labels[key] === value
+        )
+      });
+      if (matchingPods.length > 0) {
+        connectedServices.add(service.name);
+      }
 
-    // setEdges(prev => [...prev, ...masterNodeToWorkerNodes])
+      return matchingPods.map((pod, podIndex) => ({
+        id: `s-p-${serviceIndex}-${podIndex}`,
+        source: service.name,
+        target: pod.name,
+        // style: { opacity: 0 },
+      }));
+    });
+
+    const serviceNodes = k8sServicesList
+      .filter((service) => connectedServices.has(service.name))
+      .map((service, index) => ({
+        id: service.name,
+        data: { label: `Service: ${service.name}` },
+        position: { x: 1200, y: 400 + index * 75 },
+        style: { 
+          border: '1px solid black', 
+          padding: 10, 
+          fontSize: 7,
+          backgroundColor: 'orange',
+         },
+      }))
+
     setEdges(prev => {
       const newWorkerEdges = masterNodeToWorkerNodes.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
@@ -243,10 +305,16 @@ function Tree() {
       const newPodEdges = workerNodeToPods.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
       )
-      return [...prev, ...newWorkerEdges, ...newPodEdges]
+      const newServiceEdges = serviceToPods.filter(
+        (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
+      )
+      return [...prev, ...newWorkerEdges, ...newPodEdges, ...newServiceEdges]
     })
-    console.log(edges)
+
+    setNodes(prev => [ ...prev, ...serviceNodes ])
+
   }, [k8sCluster])
+
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -257,18 +325,43 @@ function Tree() {
     [],
   );
 
+  const onNodeClick = useCallback((event, node) => {
+    setVisibleEdges(prevVisibleEdges => {
+      const newVisibleEdges = new Set(prevVisibleEdges);
+      edges.forEach(edge => {
+        if (edge.source === node.id || edge.target === node.id) {
+          if (newVisibleEdges.has(edge.id)) {
+            newVisibleEdges.delete(edge.id);
+          } else {
+            newVisibleEdges.add(edge.id);
+          }
+        }
+      });
+      return newVisibleEdges;
+    });
+  }, [edges]);
+
+  const updatedEdges = edges.map(edge => ({
+    ...edge,
+    style: {
+      ...edge.style,
+      stroke: visibleEdges.has(edge.id) ? 'white' : 'none',
+    },
+  }));
+
   return (
     <>
     <div>Tree</div>
     <div style={{ height: '1000px' }}>
     <ReactFlow
       nodes={nodes}
-      edges={edges}
+      edges={updatedEdges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       defaultViewport={defaultViewport}
       minZoom={0.2}
       maxZoom={4}
+      onNodeClick={onNodeClick}
     >
       <Background />
       <Controls />
