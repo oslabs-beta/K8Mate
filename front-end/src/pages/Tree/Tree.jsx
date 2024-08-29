@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Button } from "../../components/template/button";
+import { Button } from "../../components/template/catalyst/button";
 import { 
   ReactFlow, 
   Controls, 

@@ -155,6 +155,10 @@ const styles = {
       'text-white [--btn-hover-overlay:theme(colors.white/10%)] [--btn-bg:theme(colors.rose.500)] [--btn-border:theme(colors.rose.600/90%)]',
       '[--btn-icon:theme(colors.rose.300)] data-[active]:[--btn-icon:theme(colors.rose.200)] data-[hover]:[--btn-icon:theme(colors.rose.200)]',
     ],
+    superPurple: [
+      'text-white [--btn-hover-overlay:theme(colors.white/10%)] [--btn-bg:#6001D2] [--btn-border:#5A01C2/90%]',
+      '[--btn-icon:#B48EFF] data-[active]:[--btn-icon:#A080E6] data-[hover]:[--btn-icon:#A080E6]',
+    ],
   },
 }
 

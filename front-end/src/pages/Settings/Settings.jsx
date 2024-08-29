@@ -3,16 +3,16 @@ import React, { useState, useEffect, useContext } from 'react';
 import { DateTime } from "luxon";
 import moment from "moment-timezone";
 
-import { Button } from "../../components/template/button";
-import { Checkbox, CheckboxField } from "../../components/template/checkbox";
-import { Divider } from "../../components/template/divider";
-import { Description, Label } from "../../components/template/fieldset";
-import { Heading, Subheading } from "../../components/template/heading";
-import { Input } from "../../components/template/input";
-import { Select } from "../../components/template/select";
-import { Text } from "../../components/template/text";
-import { Textarea } from "../../components/template/textarea";
-import { Switch, SwitchField } from "../../components/template/switch";
+import { Button } from "../../components/template/catalyst/button";
+import { Checkbox, CheckboxField } from "../../components/template/catalyst/checkbox";
+import { Divider } from "../../components/template/catalyst/divider";
+import { Description, Label } from "../../components/template/catalyst/fieldset";
+import { Heading, Subheading } from "../../components/template/catalyst/heading";
+import { Input } from "../../components/template/catalyst/input";
+import { Select } from "../../components/template/catalyst/select";
+import { Text } from "../../components/template/catalyst/text";
+import { Textarea } from "../../components/template/catalyst/textarea";
+import { Switch, SwitchField } from "../../components/template/catalyst/switch";
 
 import { getTimezoneOffset } from "../../hooks/useData";
 
@@ -131,10 +131,10 @@ export default function Settings() {
       <Divider className="my-10" soft />
 
       <div className="flex justify-end gap-4">
-        <Button type="reset" plain>
+        {/* <Button type="reset" plain >
           Reset
-        </Button>
-        <Button type="submit">Save changes</Button>
+        </Button> */}
+        <Button type="submit" color="superPurple">Save changes</Button>
       </div>
     </form>
   );
