@@ -223,7 +223,7 @@ function Alerts() {
           disabled={newAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{newAlertsPage}</strong> of <strong>{totalNewAlertsPages}</strong>
@@ -233,7 +233,7 @@ function Alerts() {
           disabled={newAlertsPage === totalNewAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
 
@@ -284,6 +284,7 @@ function Alerts() {
                 <TableCell>
                   <Button 
                     className="text-red-500" 
+                    color="red"
                     onClick={() => deleteAlert(alert.id, alert.log)}
                   >
                     delete
@@ -303,7 +304,7 @@ function Alerts() {
           disabled={resolvedAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{resolvedAlertsPage}</strong> of <strong>{totalResolvedAlertsPages}</strong>
@@ -313,7 +314,7 @@ function Alerts() {
           disabled={resolvedAlertsPage === totalResolvedAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
     </>
