@@ -169,7 +169,7 @@ function Alerts() {
       <div className="flex items-end justify-between gap-4">
         <Heading>New Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -216,14 +216,14 @@ function Alerts() {
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousNewAlertsPage} 
           disabled={newAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{newAlertsPage}</strong> of <strong>{totalNewAlertsPages}</strong>
@@ -233,14 +233,17 @@ function Alerts() {
           disabled={newAlertsPage === totalNewAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
-
+  
+      {/* Divider Line */}
+      <hr className="my-8 border-t-.1 border-gray-300" />
+  
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -284,6 +287,7 @@ function Alerts() {
                 <TableCell>
                   <Button 
                     className="text-red-500" 
+                    color="red"
                     onClick={() => deleteAlert(alert.id, alert.log)}
                   >
                     delete
@@ -292,18 +296,18 @@ function Alerts() {
               </TableRow>
             ))
           ) : (
-            <p>No resolved messages at this time</p>
+            <p>No resolved alerts at this time</p>
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousResolvedAlertsPage} 
           disabled={resolvedAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{resolvedAlertsPage}</strong> of <strong>{totalResolvedAlertsPages}</strong>
@@ -313,7 +317,7 @@ function Alerts() {
           disabled={resolvedAlertsPage === totalResolvedAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
     </>
