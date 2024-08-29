@@ -51,12 +51,22 @@ function Alerts() {
     fetchAlerts();
   }, [newReadStatus]);
 
+  // instnat render of alerts
   const updateAlerts = async (alertName, id, newStatus) => {
+    const updatedAlerts = alertList.map(alert => {
+      if (alert.id === id) {
+        return { ...alert, read: newStatus };
+      } else {
+        return alert;
+      }
+    });
+    setAlertList(updatedAlerts);
+
     try {
       const response = await fetch('http://localhost:8080/alert/update', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: alertName,
@@ -64,10 +74,22 @@ function Alerts() {
           status: newStatus,
         }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to update alert status');
+      }
+
+      // Optionally update the status after confirmation
       const data = await response.json();
       setReadStatus([alertName, id, newStatus]);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+
+      // Revert the optimistic update in case of an error
+      const revertedAlerts = alertList.map(alert =>
+        alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert
+      );
+      setAlertList(revertedAlerts);
     }
   };
 
@@ -100,23 +122,21 @@ function Alerts() {
     alert.log.toLowerCase().includes(search.toLowerCase())
   ).reverse();
 
-// separate alerts based on status
+  // separate alerts based on status
   const newAlerts = filteredAlerts.filter(alert => alert.read === 'unread');
   const resolvedAlerts = filteredAlerts.filter(alert => alert.read === 'read');
 
-// pagination for new alerts
+  // pagination for new alerts
   const indexOfLastNewAlert = newAlertsPage * alertsPerPage;
   const indexOfFirstNewAlert = indexOfLastNewAlert - alertsPerPage;
   const currentNewAlerts = newAlerts.slice(indexOfFirstNewAlert, indexOfLastNewAlert);
   const totalNewAlertsPages = Math.ceil(newAlerts.length / alertsPerPage);
 
-// pagination for resolved alerts
+  // pagination for resolved alerts
   const indexOfLastResolvedAlert = resolvedAlertsPage * alertsPerPage;
   const indexOfFirstResolvedAlert = indexOfLastResolvedAlert - alertsPerPage;
   const currentResolvedAlerts = resolvedAlerts.slice(indexOfFirstResolvedAlert, indexOfLastResolvedAlert);
   const totalResolvedAlertsPages = Math.ceil(resolvedAlerts.length / alertsPerPage);
-
-
 
   const handleNextNewAlertsPage = () => {
     setNewAlertsPage(prevPage => (prevPage < totalNewAlertsPages ? prevPage + 1 : prevPage));
