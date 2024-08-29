@@ -1,6 +1,6 @@
   import React, { useState } from 'react'
   import DashboardRow from '../../components/custom/DashboardRow/DashboardRow.jsx';
-  import { Heading } from '../../components/template/heading'
+  import { Heading } from '../../components/template/catalyst/heading.jsx'
 
   import styles from './Dashboard.module.css'
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 
-import { Avatar } from '../../components/template/avatar';
-import { Button } from '../../components/template/button';
-import { Heading, Subheading } from '../../components/template/heading';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/table';
-import { Select } from '../../components/template/select';
+import { Avatar } from '../../components/template/catalyst/avatar.jsx';
+import { Button } from '../../components/template/catalyst/button.jsx';
+import { Heading, Subheading } from '../../components/template/catalyst/heading.jsx';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.jsx';
+import { Select } from '../../components/template/catalyst/select.jsx';
 
 import { convertToMilitaryTime } from '../../hooks/useData.js';
 

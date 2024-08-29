@@ -1,5 +1,5 @@
 'use client'
-import { Avatar } from './template/avatar'
+import { Avatar } from './template/catalyst/avatar.jsx'
 import { useState, useContext } from 'react';
 
 
@@ -10,9 +10,9 @@ import {
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
-} from './template/dropdown'
+} from './template/catalyst/dropdown.jsx'
 
-import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/navbar'
+import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/catalyst/navbar.jsx'
 import {
   Sidebar,
   SidebarBody,
@@ -23,8 +23,8 @@ import {
   SidebarLabel,
   SidebarSection,
   SidebarSpacer,
-} from './template/sidebar'
-import { SidebarLayout } from './template/sidebar-layout'
+} from './template/catalyst/sidebar.jsx'
+import { SidebarLayout } from './template/catalyst/sidebar-layout.jsx'
 
 import GithubIcon from './custom/GithubIcon/GithubIcon.jsx'
 
@@ -75,12 +75,21 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
           </SidebarHeader>
           <SidebarBody>
             <SidebarSection>
+
+              <SidebarItem as={NavLink} to='/' current={useLocation().pathname === "/"} 
+                onClick={() => setShowSidebar(false)}
+                >
+                  <HomeIcon />
+                  <SidebarLabel>Overview</SidebarLabel>
+              </SidebarItem>
+
               <SidebarItem as={NavLink} to='/dashboard' current={useLocation().pathname === "/dashboard"} 
               onClick={() => setShowSidebar(false)}
               >
-                <HomeIcon />
-                <SidebarLabel>Dashboard</SidebarLabel>
+                <ChartBarIcon/>
+                <SidebarLabel>Reports</SidebarLabel>
               </SidebarItem>
+
               <SidebarItem as={NavLink} to="/alerts" current={useLocation().pathname === "/alerts"} 
               onClick={() => setShowSidebar(false)}
               >
@@ -100,6 +109,7 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 }
                 
               </SidebarItem>
+
               <SidebarItem as={NavLink} to="/tree"  current={useLocation().pathname === "/tree"} 
               onClick={() => setShowSidebar(false)}
               >
@@ -108,12 +118,12 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
               </SidebarItem>
 
               {/* TO BE REMOVED */}
-              <SidebarItem as={NavLink} to="/flow"  current={useLocation().pathname === "/tree"} 
+              {/* <SidebarItem as={NavLink} to="/flow"  current={useLocation().pathname === "/tree"} 
               onClick={() => setShowSidebar(false)}
               >
                 <MapIcon />
                 <SidebarLabel>ReactFlowTest</SidebarLabel>
-              </SidebarItem>
+              </SidebarItem> */}
 
               <SidebarItem as={NavLink} to="/settings"  current={useLocation().pathname === "/settings"} 
               onClick={() => setShowSidebar(false)}

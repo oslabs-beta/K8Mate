@@ -34,8 +34,8 @@ function App(props) {
       <Routes>
         {/* Use the helper function to apply the layout */}
         <Route path="/" element={withLayout(Home)} />
-        <Route path="/alerts" element={withLayout(Alerts)} />
         <Route path="/dashboard" element={withLayout(Dashboard)} />
+        <Route path="/alerts" element={withLayout(Alerts)} />
         <Route path="/tree" element={withLayout(Tree)} />
         <Route path="/settings" element={withLayout(Settings)} />
 
