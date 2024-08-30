@@ -5,12 +5,20 @@ import {
   ReactFlow, 
   Controls, 
   Background,
+  Node,
+  Edge,
   applyNodeChanges,
   applyEdgeChanges
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-const initialNodes = [
+type ClusterElement = {
+  name: string,
+  category: 'pod' | 'service' | 'node',
+  data: { [key: string]: any }
+};
+
+const initialNodes: Node[] = [
   {
     id: 'master-node',
     type: 'input',
@@ -32,8 +40,8 @@ const initialNodes = [
     id: 'etcd',
     data: { label: 'etcd' },
     position: { x: 425, y: 125 },
-    parentNode: 'master-node',
-    extent: 'parent',
+    // parentNode: 'master-node',
+    // extent: 'parent',
     style: { 
       border: '1px solid black', 
       padding: 10,
@@ -45,8 +53,8 @@ const initialNodes = [
     id: 'control-manager',
     data: { label: 'Controller Manager' },
     position: { x: 550, y: 125 },
-    parentNode: 'master-node',
-    extent: 'parent',
+    // parentNode: 'master-node',
+    // extent: 'parent',
     style: { 
       border: '1px solid black', 
       padding: 10, 
@@ -57,8 +65,8 @@ const initialNodes = [
     id: 'api-server',
     data: { label: 'API Server' },
     position: { x: 425, y: 50 },
-    parentNode: 'master-node',
-    extent: 'parent',
+    // parentNode: 'master-node',
+    // extent: 'parent',
     style: { 
       border: '1px solid black', 
       padding: 10,
@@ -69,13 +77,13 @@ const initialNodes = [
     id: 'scheduler',
     data: { label: 'Scheduler' },
     position: { x: 475, y: 210 },
-    parentNode: 'master-node',
-    extent: 'parent',
+    // parentNode: 'master-node',
+    // extent: 'parent',
     style: { border: '1px solid black', padding: 10 },
   },
 ]
 
-const initialEdges = [
+const initialEdges: Edge[] = [
   { id: 'e1-2', source: 'api-server', target: 'etcd' },
   { id: 'e1-3', source: 'api-server', target: 'control-manager' },
   { id: 'e1-4', source: 'api-server', target: 'scheduler' }
@@ -84,13 +92,13 @@ const initialEdges = [
 const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
 
 function Tree() {
-  const [ k8sCluster, setK8sCluster ] = useState([]);
-  const [ k8sPodsList, setK8sPods ] = useState([]);
-  const [ k8sNodesList, setK8sNodes ] = useState([]);
-  const [ k8sServicesList, setK8sServices ] = useState([]);
-  const [ nodes, setNodes ] = useState([]);
-  const [ edges, setEdges ] = useState(initialEdges);
-  const [ visibleEdges, setVisibleEdges ] = useState(new Set()); 
+  const [ k8sCluster, setK8sCluster ] = useState<ClusterElement[]>([]);
+  const [ k8sPodsList, setK8sPods ] = useState<ClusterElement[]>([]);
+  const [ k8sNodesList, setK8sNodes ] = useState<ClusterElement[]>([]);
+  const [ k8sServicesList, setK8sServices ] = useState<ClusterElement[]>([]);
+  const [ nodes, setNodes ] = useState<Node[]>([]);
+  const [ edges, setEdges ] = useState<Edge[]>(initialEdges);
+  const [ visibleEdges, setVisibleEdges ] = useState<Set<string>>(new Set()); 
   
   //grab all info regarding the cluster
   useEffect(() => {
@@ -143,11 +151,11 @@ function Tree() {
     setK8sServices(servicesNodes);
     setK8sNodes(nodeNodes);
 
-    const xCoordinatesCalc = (num) => {
+    const xCoordinatesCalc = (num: number): number => {
       return (num * 350) + 50;
     }
 
-    const nodesForFlow = k8sNodesList.map((node, index) => ({
+    const nodesForFlow: Node[] = k8sNodesList.map((node, index) => ({
       id: node.name,
       data: { label: `Worker Node: ${node.name}` },
       position: { x: xCoordinatesCalc(index), y: 400},
@@ -164,7 +172,7 @@ function Tree() {
       },
     }));
 
-    const groupedPodsCache = {};
+    const groupedPodsCache: Record<string, ClusterElement[]> = {};
 
     k8sNodesList.forEach((workerNode) => {
       const workerNodeName = workerNode.name;
@@ -174,7 +182,7 @@ function Tree() {
       groupedPodsCache[workerNodeName] = k8sPodsList.filter((pod) => pod.data.nodeName === workerNodeName)
     })
 
-    const podsForFlow = [];
+    const podsForFlow: Node[] = [];
   
     //positioning calculator based on indexes and grouped pods
     Object.keys(groupedPodsCache).forEach((nodeName, nodeIndex) => {
