@@ -51,12 +51,22 @@ function Alerts() {
     fetchAlerts();
   }, [newReadStatus]);
 
+  // instnat render of alerts
   const updateAlerts = async (alertName, id, newStatus) => {
+    const updatedAlerts = alertList.map(alert => {
+      if (alert.id === id) {
+        return { ...alert, read: newStatus };
+      } else {
+        return alert;
+      }
+    });
+    setAlertList(updatedAlerts);
+
     try {
       const response = await fetch('http://localhost:8080/alert/update', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: alertName,
@@ -64,10 +74,22 @@ function Alerts() {
           status: newStatus,
         }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to update alert status');
+      }
+
+      // Optionally update the status after confirmation
       const data = await response.json();
       setReadStatus([alertName, id, newStatus]);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+
+      // Revert the optimistic update in case of an error
+      const revertedAlerts = alertList.map(alert =>
+        alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert
+      );
+      setAlertList(revertedAlerts);
     }
   };
 
@@ -100,23 +122,21 @@ function Alerts() {
     alert.log.toLowerCase().includes(search.toLowerCase())
   ).reverse();
 
-// separate alerts based on status
+  // separate alerts based on status
   const newAlerts = filteredAlerts.filter(alert => alert.read === 'unread');
   const resolvedAlerts = filteredAlerts.filter(alert => alert.read === 'read');
 
-// pagination for new alerts
+  // pagination for new alerts
   const indexOfLastNewAlert = newAlertsPage * alertsPerPage;
   const indexOfFirstNewAlert = indexOfLastNewAlert - alertsPerPage;
   const currentNewAlerts = newAlerts.slice(indexOfFirstNewAlert, indexOfLastNewAlert);
   const totalNewAlertsPages = Math.ceil(newAlerts.length / alertsPerPage);
 
-// pagination for resolved alerts
+  // pagination for resolved alerts
   const indexOfLastResolvedAlert = resolvedAlertsPage * alertsPerPage;
   const indexOfFirstResolvedAlert = indexOfLastResolvedAlert - alertsPerPage;
   const currentResolvedAlerts = resolvedAlerts.slice(indexOfFirstResolvedAlert, indexOfLastResolvedAlert);
   const totalResolvedAlertsPages = Math.ceil(resolvedAlerts.length / alertsPerPage);
-
-
 
   const handleNextNewAlertsPage = () => {
     setNewAlertsPage(prevPage => (prevPage < totalNewAlertsPages ? prevPage + 1 : prevPage));
@@ -149,7 +169,7 @@ function Alerts() {
       <div className="flex items-end justify-between gap-4">
         <Heading>New Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -196,14 +216,14 @@ function Alerts() {
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousNewAlertsPage} 
           disabled={newAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{newAlertsPage}</strong> of <strong>{totalNewAlertsPages}</strong>
@@ -213,14 +233,17 @@ function Alerts() {
           disabled={newAlertsPage === totalNewAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
-
+  
+      {/* Divider Line */}
+      <hr className="my-8 border-t-.1 border-gray-300" />
+  
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
       </div>
-
+  
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -264,6 +287,7 @@ function Alerts() {
                 <TableCell>
                   <Button 
                     className="text-red-500" 
+                    color="red"
                     onClick={() => deleteAlert(alert.id, alert.log)}
                   >
                     delete
@@ -272,18 +296,18 @@ function Alerts() {
               </TableRow>
             ))
           ) : (
-            <p>No resolved messages at this time</p>
+            <p>No resolved alerts at this time</p>
           )}
         </TableBody>
       </Table>
-
+  
       <div className="flex justify-between items-center my-4">
         <Button 
           onClick={handlePreviousResolvedAlertsPage} 
           disabled={resolvedAlertsPage === 1} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Previous
+          prev
         </Button>
         <span className="text-gray-700 text-lg">
           Page <strong>{resolvedAlertsPage}</strong> of <strong>{totalResolvedAlertsPages}</strong>
@@ -293,7 +317,7 @@ function Alerts() {
           disabled={resolvedAlertsPage === totalResolvedAlertsPages} 
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Next
+          next
         </Button>
       </div>
     </>
