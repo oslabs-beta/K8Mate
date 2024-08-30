@@ -91,7 +91,7 @@ const initialEdges: Edge[] = [
 
 const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
 
-function Tree() {
+const Tree = (): JSX.Element => {
   const [ k8sCluster, setK8sCluster ] = useState<ClusterElement[]>([]);
   const [ k8sPodsList, setK8sPods ] = useState<ClusterElement[]>([]);
   const [ k8sNodesList, setK8sNodes ] = useState<ClusterElement[]>([]);
@@ -110,7 +110,7 @@ function Tree() {
           }
         })
         if (response.ok) {
-          const cluster = await response.json();
+          const cluster: ClusterElement[] = await response.json();
           console.log('CLUSTER INFO', cluster);
           setNodes(initialNodes)
           setK8sCluster(cluster);
@@ -130,7 +130,7 @@ function Tree() {
         }
       })
       if (response.ok) {
-        const refreshedCluster = await response.json();
+        const refreshedCluster: ClusterElement[] = await response.json();
         setK8sCluster(refreshedCluster)
       }
     } catch (err) {
@@ -140,11 +140,11 @@ function Tree() {
 
   //setting NODES
   useEffect(() => {
-    const podsNodes = k8sCluster.filter((ele) => ele.category === 'pod');
+    const podsNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'pod');
     console.log('POD NODES', podsNodes)
-    const servicesNodes = k8sCluster.filter((ele) => ele.category === 'service')
+    const servicesNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'service')
     console.log('SERVICE NODES', servicesNodes)
-    const nodeNodes = k8sCluster.filter((ele) => ele.category === 'node');
+    const nodeNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'node');
     console.log('NODE NODES', nodeNodes)
 
     setK8sPods(podsNodes);
@@ -211,21 +211,21 @@ function Tree() {
 
   //setting EDGES
   useEffect(() => {
-    const masterNodeToWorkerNodes = k8sNodesList.map((node, index) => ({
+    const masterNodeToWorkerNodes: Edge[] = k8sNodesList.map((node, index) => ({
       id: `el2-${index}`,
       source: 'master-node',
       target: node.name,
     }));
 
-    const workerNodeToPods = k8sPodsList.map((pod, index) => ({
+    const workerNodeToPods: Edge[] = k8sPodsList.map((pod, index) => ({
       id: `el3-${index}`,
       source: pod.data.nodeName,
       target: pod.name,
     }));
     
-    const connectedServices = new Set();
+    const connectedServices = new Set<string>();
 
-    const serviceToPods = k8sServicesList.flatMap((service, serviceIndex) => {
+    const serviceToPods: Edge[] = k8sServicesList.flatMap((service, serviceIndex) => {
       if (!service.data.selector) return [];
       const matchingPods = k8sPodsList.filter((pod) => {
         if (!pod.data.labels) return;
@@ -244,7 +244,7 @@ function Tree() {
       }));
     });
 
-    const serviceNodes = k8sServicesList
+    const serviceNodes: Node[] = k8sServicesList
       .filter((service) => connectedServices.has(service.name))
       .map((service, index) => ({
         id: service.name,
@@ -259,13 +259,13 @@ function Tree() {
       }))
 
     setEdges(prev => {
-      const newWorkerEdges = masterNodeToWorkerNodes.filter(
+      const newWorkerEdges: Edge[] = masterNodeToWorkerNodes.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
       );
-      const newPodEdges = workerNodeToPods.filter(
+      const newPodEdges: Edge[] = workerNodeToPods.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
       )
-      const newServiceEdges = serviceToPods.filter(
+      const newServiceEdges: Edge[] = serviceToPods.filter(
         (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
       )
       return [...prev, ...newWorkerEdges, ...newPodEdges, ...newServiceEdges]
@@ -301,7 +301,7 @@ function Tree() {
     });
   }, [edges]);
 
-  const updatedEdges = edges.map((edge) => ({
+  const updatedEdges: Edge[] = edges.map((edge) => ({
     ...edge,
     style: {
       ...edge.style,
