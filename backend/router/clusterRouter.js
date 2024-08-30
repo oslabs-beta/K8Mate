@@ -25,6 +25,23 @@ router.get('/refresh',
   }
 )
 
+router.get('/history',
+  clusterController.getHistory,
+  (req, res) => {
+    return res.status(200).json(res.locals.history);
+  }
+)
+
+router.post('/postAll',
+  k8sController.getPods,
+  k8sController.getNodes,
+  k8sController.getServices,
+  clusterController.postSnapshot,
+  (req, res) => {
+    return res.status(200).json(res.locals.cluster);
+  }
+)
+
 router.post('/postPods',
   k8sController.getPods,
   clusterController.postPods,
