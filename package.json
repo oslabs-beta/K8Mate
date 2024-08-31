@@ -2,11 +2,11 @@
   "name": "super-kuber",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node backend/server.js",
-    "server": "nodemon backend/server.js",
+    "start": "node backend/server.ts",
+    "server": "nodemon backend/server.ts",
     "client": "npm run dev --prefix front-end",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
