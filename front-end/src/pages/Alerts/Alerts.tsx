@@ -8,14 +8,19 @@ import { Select } from '../../components/template/catalyst/select.jsx';
 
 import { convertToMilitaryTime } from '../../hooks/useData.js';
 
-import { AlertsContext } from './AlertsContext';
-import { SettingsContext } from '../../contexts/SettingsContext';
+import { AlertsContext } from './AlertsContext.tsx';
+import { SettingsContext } from '../../contexts/SettingsContext.jsx';
+
+type AlertData = {
+  id: string,
+  read: "read" | "unread"
+}
 
 function Alerts() {
 
   const { timezone } = useContext(SettingsContext);
 
-  const [alertList, setAlertList] = useState([]);
+  const [alertList, setAlertList] = useState<AlertData[]>([]);
   const [newReadStatus, setReadStatus] = useState('');
   const [search, setSearch] = useState('');
 
@@ -40,7 +45,8 @@ function Alerts() {
           }
         });
         if (response.ok) {
-          const alerts = await response.json();
+          const alerts: AlertData[] = await response.json();
+          console.log("READ THIS THIS THIS ", alerts)
           updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
           setAlertList(alerts);
         }
@@ -53,7 +59,7 @@ function Alerts() {
 
   // instnat render of alerts
   const updateAlerts = async (alertName, id, newStatus) => {
-    const updatedAlerts = alertList.map(alert => {
+    const updatedAlerts: AlertData[] = alertList.map(alert => {
       if (alert.id === id) {
         return { ...alert, read: newStatus };
       } else {
@@ -86,7 +92,7 @@ function Alerts() {
       console.error(err);
 
       // Revert the optimistic update in case of an error
-      const revertedAlerts = alertList.map(alert =>
+      const revertedAlerts: AlertData[] = alertList.map(alert =>
         alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert
       );
       setAlertList(revertedAlerts);
