@@ -133,6 +133,12 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 <SidebarLabel>Settings</SidebarLabel>
               </SidebarItem>
 
+              <SidebarItem as={NavLink} to="/terminal"  current={useLocation().pathname === "/terminal"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <Cog6ToothIcon />
+                <SidebarLabel>Terminal</SidebarLabel>
+              </SidebarItem>
 
 
 

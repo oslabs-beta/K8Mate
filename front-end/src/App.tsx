@@ -13,6 +13,7 @@ import Tree from './pages/Tree/Tree';
 import Notfound from './pages/Notfound/Notfound';
 import Flow from './pages/Flow/Flow';
 import Settings from './pages/Settings/Settings';
+import Terminal from './pages/Terminal/Terminal';
 
 import { ApplicationLayout } from './components/application-layout'
 
@@ -39,6 +40,7 @@ function App(props) {
         <Route path="/alerts" element={withLayout(Alerts)} />
         <Route path="/tree" element={withLayout(Tree)} />
         <Route path="/settings" element={withLayout(Settings)} />
+        <Route path="/terminal" element={withLayout(Terminal)} />
 
         {/* TO BE REMOVED */}
         <Route path="/flow" element={withLayout(Flow)} />
