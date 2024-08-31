@@ -30,7 +30,7 @@ app.use('/cluster', clusterRouter);
 //   }
 // })
 
-app.use((req, res) =>
+app.use((req: Express.Request, res) =>
     res.status(404).send("This is not the page you are looking for...")
   );
 
