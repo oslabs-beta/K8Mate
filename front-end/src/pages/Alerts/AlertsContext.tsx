@@ -1,17 +1,42 @@
-import react, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 
 const AlertsContext = createContext();
 
+type AvailMem = {
+  nodeName: string,
+  memNum: number
+}
+
+type PodDetails = {
+  podName: string,
+  podID: number
+}
+
+type NetworkData = {
+  nodeName: string,
+  bitsPerSecond: number
+}
+
+type DiskData = {
+  nodeName: string,
+  diskNum: number
+}
+
+type CpuData = {
+  nodeName: string,
+  cpuUsage: number
+}
 const AlertsProvider = ({ children }) => {
-  const [ availableMemory, setAvailableMemory ] = useState([])
-  const [ networkTraffic, setNetworkTraffic ] = useState([])
-  const [ diskSpace, setDiskSpace ] = useState([])
-  const [ cpuData, setCpuData ] = useState([]);
+
+  const [ availableMemory, setAvailableMemory ] = useState<AvailMem[]>([])
+  const [ networkTraffic, setNetworkTraffic ] = useState<NetworkData[]>([])
+  const [ diskSpace, setDiskSpace ] = useState<DiskData[]>([])
+  const [ cpuData, setCpuData ] = useState<CpuData[]>([]);
   const [ runningPods, setRunningPods ] = useState(null);
-  const [ podDetails, setPodDetails] = useState([]); //array of pod names to compare
-  const [ prevPodDetails, setPrevPodDetails ] = useState([]);
-  const [ alertList, setAlertList ] = useState([]);
-  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState(false)
+  const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); //array of pod names to compare
+  const [ prevPodDetails, setPrevPodDetails ] = useState<PodDetails[]>([]);
+  const [ alertList, setAlertList ] = useState<string[]>([]);
+  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState<Boolean>(false)
   // const hasFetchedCpuData = useRef(false);
 
   // Function to update alertsUnreadStatus
@@ -30,14 +55,14 @@ const AlertsProvider = ({ children }) => {
         const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
         const data = await response.json();
         // console.log("READ THIS SHIT HERE", data)
-        const memData = data.data.result.map((mem) => {
+        const memData: AvailMem[] = data.data.result.map((mem) => {
           return {
             nodeName: mem.metric.instance,
             memNum: mem.value[1]
           }
         });
         setAvailableMemory(memData)
-      } catch(err) {
+      } catch(err: unknown) {
         console.log(err)
       }
     }
@@ -74,7 +99,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Memory alert failed to send')
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err)
     }
   }
@@ -101,7 +126,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('CPU alert failed to send');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err);
     }
   }
@@ -127,7 +152,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Failed pod alert failed to send');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err);
     }
   }
@@ -154,7 +179,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Restarted pod alert failed to send');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err);
     }
   }
@@ -167,7 +192,7 @@ const AlertsProvider = ({ children }) => {
         const response = await fetch('http://localhost:9090/api/v1/query?query=kube_pod_info')
         const data = await response.json();
         // console.log('pod descriptions', data)
-        const podData = data.data.result.map((pod) => {
+        const podData: PodDetails[] = data.data.result.map((pod) => {
           return {
           podName: pod.metric.pod,
           podID: pod.metric.uid
@@ -175,7 +200,7 @@ const AlertsProvider = ({ children }) => {
         });
         setPodDetails(podData);
       }
-      catch(err) {
+      catch(err: unknown) {
         console.log(err)
       }
     }
@@ -227,7 +252,7 @@ const AlertsProvider = ({ children }) => {
         const data = await response.json();
         
         if (data.status === 'success' && data.data.result.length > 0) {
-          const trafficData = data.data.result.map(result => ({
+          const trafficData: NetworkData[] = data.data.result.map(result => ({
             nodeName: result.metric.instance,
             bitsPerSecond: parseFloat(result.value[1]) * 8 
           }));
@@ -235,7 +260,7 @@ const AlertsProvider = ({ children }) => {
         } else {
           console.log('No data available or query failed.');
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.log('Error fetching network traffic data:', err);
       }
     };
@@ -274,7 +299,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Network traffic alert failed to send');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err);
     }
   };
@@ -288,13 +313,13 @@ const AlertsProvider = ({ children }) => {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100*(1-(node_filesystem_avail_bytes/node_filesystem_size_bytes))');
         const data = await response.json();
         console.log('DISK SPACE ALERT:', data);
-            const diskData = data.data.result.map((disk) => ({
-              nodeName: disk.metric.instance,
-              diskNum: disk.value[1]
-            }))
-            // console.log('HER EHERE HERE HERE' + diskData)
-            setDiskSpace(diskData)
-      } catch (err) {
+        const diskData: DiskData[] = data.data.result.map((disk) => ({
+          nodeName: disk.metric.instance,
+          diskNum: disk.value[1]
+        }))
+        // console.log('HER EHERE HERE HERE' + diskData)
+        setDiskSpace(diskData)
+      } catch (err: unknown) {
         console.log(err);
       }
     };
@@ -332,7 +357,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Disk Space alert failed to send');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.log(err);
     }
   }
@@ -346,12 +371,12 @@ const AlertsProvider = ({ children }) => {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
         const data = await response.json();
         // console.log('DATA', data);
-        const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
+        const cpuUsagePerNode: CpuData[] = data.data.result.map((cpuUse) => ({
           nodeName: cpuUse.metric.nodeName,
           cpuUsage: cpuUse.value[1],
         }))
         setCpuData(cpuUsagePerNode);
-      } catch (err) {
+      } catch (err: unknown) {
         console.log(err);
       }
     };
@@ -395,7 +420,7 @@ const AlertsProvider = ({ children }) => {
             setAlertsUnreadStatus(false)
           }
         }
-      } catch(err) {
+      } catch(err: unknown) {
         console.log(err);
       }
     }

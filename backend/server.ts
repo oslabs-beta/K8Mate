@@ -4,6 +4,7 @@ const port = 8080;
 const path = require('path');
 const cors = require('cors');
 const k8s = require('@kubernetes/client-node');
+import { Request, Response, NextFunction } from 'express';
 
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
@@ -30,11 +31,11 @@ app.use('/cluster', clusterRouter);
 //   }
 // })
 
-app.use((req: Express.Request, res) =>
+app.use((req: Request, res: Response) =>
     res.status(404).send("This is not the page you are looking for...")
   );
 
-app.use((err, req, res, next) => {
+app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     const defaultErr = {
       log: 'Express error handler caught unknown middleware error',
       status: 500,
