@@ -1,13 +1,15 @@
 import react, { createContext, useState, useEffect, useRef } from 'react';
 import { DateTime } from "luxon";
+import React from 'react'
 
 const SettingsContext = createContext()
 
-const SettingsProvider = ({children}) => {
-    const [timezone, setTimezone] = useState(DateTime.local().zoneName)
-    const [localTimezone, setLocalTimezone] = useState(DateTime.local().zoneName)
 
-    const [isDarkMode, setIsDarkMode] = useState(false)
+const SettingsProvider = ({children}) => {
+    const [timezone, setTimezone] = useState<string>(DateTime.local().zoneName)
+    const [localTimezone, setLocalTimezone] = useState<string>(DateTime.local().zoneName)
+
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
 
     
     useEffect(() => {
