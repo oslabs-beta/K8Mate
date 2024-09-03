@@ -29,7 +29,7 @@ function Home() {
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Function to handle iframe load errors
-  const handleIframeError: () => void = () => {
+  const handleIframeError = () => {
     setErrorMessage(
       "Some content failed to load. Please check the connection or try again later."
     );
