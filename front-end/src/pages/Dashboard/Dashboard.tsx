@@ -8,7 +8,7 @@ function Dashboard(props) {
   // State for drop down for different iframes
   const [graphState, setGraphState] = useState<string>('default');
 
-  const handleChangeGraph = (e) => {
+  const handleChangeGraph = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setGraphState(e.target.value);
   };
 
