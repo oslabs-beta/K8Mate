@@ -23,15 +23,41 @@ type AlertData = {
 
 function Alerts() {
 
-  const { timezone } = useContext(SettingsContext);
+  const context = useContext(SettingsContext);
+    if (!context) {
+      throw new Error('Context not within provider');
+    }
+
+    const {
+      timezone, 
+      // localTimezone, 
+      // updateTimezone,
+      // isDarkMode,
+      // toggleTheme
+    } = context
+
+    const alertsContexts = useContext(AlertsContext);
+    if (!alertsContexts) {
+      throw new Error('Context not within provider')
+    }
+
+    const { 
+        // alertsUnreadStatus,
+        updateAlertsUnreadStatus,
+      } = alertsContexts;
+
+    
+
   const [alertList, setAlertList] = useState<AlertData[]>([]);
   const [newReadStatus, setReadStatus] = useState<string>('');
   const [search, setSearch] = useState<string>('');
 
-  const { 
-    alertsUnreadStatus,
-    updateAlertsUnreadStatus,
-  } = useContext(AlertsContext);
+  // const { 
+  //   alertsUnreadStatus,
+  //   updateAlertsUnreadStatus,
+  // } = useContext(AlertsContext);
+
+
 
   // pagination states
   const [newAlertsPage, setNewAlertsPage] = useState<number>(1);

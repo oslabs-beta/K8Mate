@@ -8,7 +8,7 @@ import App from './App.jsx'
 import './index.css'
 
 import { AlertsProvider } from './pages/Alerts/AlertsContext.jsx'
-import { SettingsProvider } from './contexts/SettingsContext.jsx'
+import { SettingsProvider } from './contexts/SettingsContext.tsx'
 
 
 /* =================================================================== */
