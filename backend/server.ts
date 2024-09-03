@@ -8,7 +8,6 @@ const k8s = require('@kubernetes/client-node');
 // const WebSocket = require('ws');
 // const { WebSocketServer } = require('ws');
 import { Request, Response, NextFunction } from 'express';
-import { Server } from 'http';
 import WebSocket, { WebSocketServer } from 'ws';
 import { spawn } from 'node-pty';
 
