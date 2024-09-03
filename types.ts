@@ -1,27 +1,24 @@
 import { RequestHandler } from 'express';
 
 export type alert = {
-    createAlert: RequestHandler,
-    getAlert: RequestHandler, 
-    updateAlert: RequestHandler,
-    deleteAlert: RequestHandler
-  };
+  createAlert: RequestHandler,
+  getAlert: RequestHandler, 
+  updateAlert: RequestHandler,
+  deleteAlert: RequestHandler
+};
   
-  export type Player = "X" | "O";
-  
-  export type BoardText = "X" | "O" | "-";
-  
-  export type BoardContent = BoardText[][];
-  
-  export type BoxProps = {
-    handleBoxClick: (index: number) => void,
-    character: string,
-    boxKey: number
-  };
-  
-  export type RowProps = {
-    handleBoxClick: (index: number) => void,
-    rowChar: string[],
-    rowKey: number}
-  
-  
+export type cluster = {
+  postPods: RequestHandler, 
+  postNodes: RequestHandler, 
+  postServices: RequestHandler, 
+  deleteRows: RequestHandler, 
+  getAll: RequestHandler,
+  postSnapshot: RequestHandler, 
+  getHistory: RequestHandler
+}; 
+
+export type k8scontroller = {
+  getPods: RequestHandler,
+  getNodes: RequestHandler,
+  getServices: RequestHandler
+}

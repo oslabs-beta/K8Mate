@@ -1,4 +1,4 @@
-const db = require("../models/alertModel");
+const db = require("../models/dbModel");
 import { Request, Response, NextFunction } from 'express';
 import { QueryResult } from 'pg';
 import { alert } from '../../types.ts';

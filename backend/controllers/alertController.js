@@ -1,4 +1,4 @@
-const db = require("../models/alertModel");
+const db = require("../models/dbModel");
 
 const alertController = {};
 
