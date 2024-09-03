@@ -434,14 +434,12 @@ const AlertsProvider = ({ children }) => {
           console.log('Failed Fetch');
           return;
         }
-        if (response.ok) {
-          const alerts = await response.json()
-          const hasReadTrue = alerts.some(alert => alert.read ==='unread')
-          if (hasReadTrue) {
-            setAlertsUnreadStatus(hasReadTrue)
-          } else {
-            setAlertsUnreadStatus(false)
-          }
+        const alerts = await response.json()
+        const hasReadTrue = alerts.some(alert => alert.read ==='unread')
+        if (hasReadTrue) {
+          setAlertsUnreadStatus(hasReadTrue)
+        } else {
+          setAlertsUnreadStatus(false)
         }
       } catch(err: unknown) {
         console.log(err);
