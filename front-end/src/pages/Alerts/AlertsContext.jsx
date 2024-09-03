@@ -1,58 +1,21 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import react, { createContext, useState, useEffect, useRef } from 'react';
 
-type AlertsContextsValues = {
-  diskSpace: DiskData[],
-  cpuData: CpuData[],
-  // runningPods: qweq,
-  podDetails: PodDetails[],
-  alertList: string[]
-  alertsUnreadStatus: Boolean
-  updateAlertsUnreadStatus: (status: Boolean) => void
-}
+const AlertsContext = createContext();
 
-const AlertsContext = createContext<AlertsContextsValues | undefined>(undefined);
-
-
-
-type AvailMem = {
-  nodeName: string,
-  memNum: number
-}
-
-type PodDetails = {
-  podName: string,
-  podID: number
-}
-
-type NetworkData = {
-  nodeName: string,
-  bitsPerSecond: number
-}
-
-type DiskData = {
-  nodeName: string,
-  diskNum: number
-}
-
-type CpuData = {
-  nodeName: string,
-  cpuUsage: number
-}
 const AlertsProvider = ({ children }) => {
-
-  const [ availableMemory, setAvailableMemory ] = useState<AvailMem[]>([])
-  const [ networkTraffic, setNetworkTraffic ] = useState<NetworkData[]>([])
-  const [ diskSpace, setDiskSpace ] = useState<DiskData[]>([])
-  const [ cpuData, setCpuData ] = useState<CpuData[]>([]);
-  // const [ runningPods, setRunningPods ] = useState(null);
-  const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); //array of pod names to compare
-  const [ prevPodDetails, setPrevPodDetails ] = useState<PodDetails[]>([]);
-  const [ alertList, setAlertList ] = useState<string[]>([]);
-  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState<Boolean>(false)
+  const [ availableMemory, setAvailableMemory ] = useState([])
+  const [ networkTraffic, setNetworkTraffic ] = useState([])
+  const [ diskSpace, setDiskSpace ] = useState([])
+  const [ cpuData, setCpuData ] = useState([]);
+  const [ runningPods, setRunningPods ] = useState(null);
+  const [ podDetails, setPodDetails] = useState([]); //array of pod names to compare
+  const [ prevPodDetails, setPrevPodDetails ] = useState([]);
+  const [ alertList, setAlertList ] = useState([]);
+  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState(false)
   // const hasFetchedCpuData = useRef(false);
 
   // Function to update alertsUnreadStatus
-  const updateAlertsUnreadStatus = (status: Boolean) => {
+  const updateAlertsUnreadStatus = (status) => {
     setAlertsUnreadStatus(status);
   };
 
@@ -65,21 +28,16 @@ const AlertsProvider = ({ children }) => {
       try {
         const query = encodeURIComponent('node_memory_MemAvailable_bytes');
         const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
         const data = await response.json();
         // console.log("READ THIS SHIT HERE", data)
-        const memData: AvailMem[] = data.data.result.map((mem) => {
+        const memData = data.data.result.map((mem) => {
           return {
             nodeName: mem.metric.instance,
             memNum: mem.value[1]
           }
         });
         setAvailableMemory(memData)
-  
-      } catch(err: unknown) {
+      } catch(err) {
         console.log(err)
       }
     }
@@ -116,7 +74,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Memory alert failed to send')
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err)
     }
   }
@@ -143,7 +101,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('CPU alert failed to send');
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -169,7 +127,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Failed pod alert failed to send');
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -196,7 +154,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Restarted pod alert failed to send');
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -207,13 +165,9 @@ const AlertsProvider = ({ children }) => {
     const pods = async () => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=kube_pod_info')
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
         const data = await response.json();
         // console.log('pod descriptions', data)
-        const podData: PodDetails[] = data.data.result.map((pod) => {
+        const podData = data.data.result.map((pod) => {
           return {
           podName: pod.metric.pod,
           podID: pod.metric.uid
@@ -221,7 +175,7 @@ const AlertsProvider = ({ children }) => {
         });
         setPodDetails(podData);
       }
-      catch(err: unknown) {
+      catch(err) {
         console.log(err)
       }
     }
@@ -270,13 +224,10 @@ const AlertsProvider = ({ children }) => {
       try {
         const query = encodeURIComponent('(irate(node_network_receive_bytes_total[1m]) + irate(node_network_transmit_bytes_total[1m]))');
         const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
         const data = await response.json();
+        
         if (data.status === 'success' && data.data.result.length > 0) {
-          const trafficData: NetworkData[] = data.data.result.map(result => ({
+          const trafficData = data.data.result.map(result => ({
             nodeName: result.metric.instance,
             bitsPerSecond: parseFloat(result.value[1]) * 8 
           }));
@@ -284,7 +235,7 @@ const AlertsProvider = ({ children }) => {
         } else {
           console.log('No data available or query failed.');
         }
-      } catch (err: unknown) {
+      } catch (err) {
         console.log('Error fetching network traffic data:', err);
       }
     };
@@ -323,7 +274,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Network traffic alert failed to send');
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err);
     }
   };
@@ -335,19 +286,15 @@ const AlertsProvider = ({ children }) => {
     const lowDiskSpace = async () => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100*(1-(node_filesystem_avail_bytes/node_filesystem_size_bytes))');
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
         const data = await response.json();
         console.log('DISK SPACE ALERT:', data);
-        const diskData: DiskData[] = data.data.result.map((disk) => ({
-          nodeName: disk.metric.instance,
-          diskNum: disk.value[1]
-        }))
-        // console.log('HER EHERE HERE HERE' + diskData)
-        setDiskSpace(diskData)
-      } catch (err: unknown) {
+            const diskData = data.data.result.map((disk) => ({
+              nodeName: disk.metric.instance,
+              diskNum: disk.value[1]
+            }))
+            // console.log('HER EHERE HERE HERE' + diskData)
+            setDiskSpace(diskData)
+      } catch (err) {
         console.log(err);
       }
     };
@@ -385,7 +332,7 @@ const AlertsProvider = ({ children }) => {
       } else {
         console.log('Disk Space alert failed to send');
       }
-    } catch (err: unknown) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -397,18 +344,14 @@ const AlertsProvider = ({ children }) => {
     const cpuUsage = async () => {
       try {
         const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
         const data = await response.json();
         // console.log('DATA', data);
-        const cpuUsagePerNode: CpuData[] = data.data.result.map((cpuUse) => ({
+        const cpuUsagePerNode = data.data.result.map((cpuUse) => ({
           nodeName: cpuUse.metric.nodeName,
           cpuUsage: cpuUse.value[1],
         }))
         setCpuData(cpuUsagePerNode);
-      } catch (err: unknown) {
+      } catch (err) {
         console.log(err);
       }
     };
@@ -442,29 +385,28 @@ const AlertsProvider = ({ children }) => {
             'Content-Type': 'application/json'
           }
         })
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return;
+        if (response.ok) {
+          const alerts = await response.json()
+          const hasReadTrue = alerts.some(alert => alert.read ==='unread')
+
+          if (hasReadTrue) {
+            setAlertsUnreadStatus(hasReadTrue)
+          } else {
+            setAlertsUnreadStatus(false)
+          }
         }
-        const alerts = await response.json()
-        const hasReadTrue = alerts.some(alert => alert.read ==='unread')
-        if (hasReadTrue) {
-          setAlertsUnreadStatus(hasReadTrue)
-        } else {
-          setAlertsUnreadStatus(false)
-        }
-      } catch(err: unknown) {
+      } catch(err) {
         console.log(err);
       }
     }
     fetchAlerts();
   }, [])
-  
+
 
   const contextValue = {
     diskSpace,
     cpuData,
-    // runningPods,
+    runningPods,
     podDetails,
     alertList,
     alertsUnreadStatus,

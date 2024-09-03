@@ -1,13 +1,23 @@
 import react, { createContext, useState, useEffect, useRef } from 'react';
 import { DateTime } from "luxon";
+import React from 'react'
 
-const SettingsContext = createContext()
+type SettingsContexts = {
+    timezone: string,
+    localTimezone: string,
+    updateTimezone: (zone: string) => void,
+    isDarkMode: boolean,
+    toggleTheme: () => void
+}
+
+const SettingsContext = createContext<SettingsContexts | undefined>(undefined)
+
 
 const SettingsProvider = ({children}) => {
-    const [timezone, setTimezone] = useState(DateTime.local().zoneName)
-    const [localTimezone, setLocalTimezone] = useState(DateTime.local().zoneName)
+    const [timezone, setTimezone] = useState<string>(DateTime.local().zoneName)
+    const [localTimezone, setLocalTimezone] = useState<string>(DateTime.local().zoneName)
 
-    const [isDarkMode, setIsDarkMode] = useState(false)
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
 
     
     useEffect(() => {
@@ -26,7 +36,7 @@ const SettingsProvider = ({children}) => {
 
     /* ------------- Helper functions ------------- */
 
-    const updateTimezone = (zone) => {
+    const updateTimezone = (zone: string) => {
         setTimezone(zone)
     }
 

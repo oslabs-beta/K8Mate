@@ -8,60 +8,26 @@ import { Select } from '../../components/template/catalyst/select.jsx';
 
 import { convertToMilitaryTime } from '../../hooks/useData.js';
 
-import { AlertsContext } from './AlertsContext.tsx';
-import { SettingsContext } from '../../contexts/SettingsContext.jsx';
-
-type AlertData = {
-  id: string,
-  node_id: string,
-  node_name: string,
-  log: string,
-  category: string,
-  created_at: string,
-  read: "read" | "unread"
-}
+import { AlertsContext } from './AlertsContext';
+import { SettingsContext } from '../../contexts/SettingsContext';
 
 function Alerts() {
 
-  const context = useContext(SettingsContext);
-    if (!context) {
-      throw new Error('Context not within provider');
-    }
+  const { timezone } = useContext(SettingsContext);
 
-    const {
-      timezone, 
-      // localTimezone, 
-      // updateTimezone,
-      // isDarkMode,
-      // toggleTheme
-    } = context
+  const [alertList, setAlertList] = useState([]);
+  const [newReadStatus, setReadStatus] = useState('');
+  const [search, setSearch] = useState('');
 
-    const alertsContexts = useContext(AlertsContext);
-    if (!alertsContexts) {
-      throw new Error('Context not within provider')
-    }
-
-    const { 
-        // alertsUnreadStatus,
-        updateAlertsUnreadStatus,
-      } = alertsContexts;
-
-    
-
-  const [alertList, setAlertList] = useState<AlertData[]>([]);
-  const [newReadStatus, setReadStatus] = useState<string>('');
-  const [search, setSearch] = useState<string>('');
-
-  // const { 
-  //   alertsUnreadStatus,
-  //   updateAlertsUnreadStatus,
-  // } = useContext(AlertsContext);
-
+  const { 
+    alertsUnreadStatus,
+    updateAlertsUnreadStatus,
+  } = useContext(AlertsContext);
 
 
   // pagination states
-  const [newAlertsPage, setNewAlertsPage] = useState<number>(1);
-  const [resolvedAlertsPage, setResolvedAlertsPage] = useState<number>(1);
+  const [newAlertsPage, setNewAlertsPage] = useState(1);
+  const [resolvedAlertsPage, setResolvedAlertsPage] = useState(1);
   const alertsPerPage = 5; 
 
   useEffect(() => {
@@ -74,8 +40,7 @@ function Alerts() {
           }
         });
         if (response.ok) {
-          const alerts: AlertData[] = await response.json();
-          console.log("READ THIS THIS THIS ", alerts)
+          const alerts = await response.json();
           updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
           setAlertList(alerts);
         }
@@ -87,7 +52,7 @@ function Alerts() {
   }, [newReadStatus]);
 
   // instnat render of alerts
-  const updateAlerts = async (alertName: string, id: string, newStatus: "read" | "unread") => {
+  const updateAlerts = async (alertName, id, newStatus) => {
     const updatedAlerts = alertList.map(alert => {
       if (alert.id === id) {
         return { ...alert, read: newStatus };
@@ -116,24 +81,24 @@ function Alerts() {
 
       // Optionally update the status after confirmation
       const data = await response.json();
-      setReadStatus([alertName, id, newStatus].toString());
+      setReadStatus([alertName, id, newStatus]);
     } catch (err) {
       console.error(err);
 
       // Revert the optimistic update in case of an error
-      const revertedAlerts: AlertData[] = alertList.map(alert =>
+      const revertedAlerts = alertList.map(alert =>
         alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert
       );
       setAlertList(revertedAlerts);
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, alertName: string, id: string) => {
-    const newStatus = event.target.value as "read" | "unread";
+  const handleChange = (event, alertName, id) => {
+    const newStatus = event.target.value;
     updateAlerts(alertName, id, newStatus);
   };
 
-  const deleteAlert = async (id: string, log: string) => {
+  const deleteAlert = async (id, log) => {
     try {
       const response = await fetch('http://localhost:8080/alert/delete', {
         method: 'DELETE',

@@ -17,8 +17,8 @@ kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 // const mysql = require('mysql');
 
-const alertRouter = require('./router/alertRouter');
-const clusterRouter = require('./router/clusterRouter');
+const alertRouter = require('./router/alertRouter.ts');
+const clusterRouter = require('./router/clusterRouter.ts');
 
 app.use(cors());
 app.use(express.json());
@@ -27,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/alert', alertRouter);
 app.use('/cluster', clusterRouter);
 
+<<<<<<< HEAD
 // app.get('/pods', async (req, res) => {
 //   try {
 //     const response = await k8sApi.listPodForAllNamespaces();
@@ -62,6 +63,8 @@ wss.on('connection', (ws: WebSocket) => {
 });
 
 
+=======
+>>>>>>> dev
 app.use((req: Request, res: Response) =>
     res.status(404).send("This is not the page you are looking for...")
   );
