@@ -13,26 +13,29 @@ import { SettingsContext } from '../../contexts/SettingsContext.jsx';
 
 type AlertData = {
   id: string,
+  node_id: string,
+  node_name: string,
+  log: string,
+  category: string,
+  created_at: string,
   read: "read" | "unread"
 }
 
 function Alerts() {
 
   const { timezone } = useContext(SettingsContext);
-
   const [alertList, setAlertList] = useState<AlertData[]>([]);
-  const [newReadStatus, setReadStatus] = useState('');
-  const [search, setSearch] = useState('');
+  const [newReadStatus, setReadStatus] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
 
   const { 
     alertsUnreadStatus,
     updateAlertsUnreadStatus,
   } = useContext(AlertsContext);
 
-
   // pagination states
-  const [newAlertsPage, setNewAlertsPage] = useState(1);
-  const [resolvedAlertsPage, setResolvedAlertsPage] = useState(1);
+  const [newAlertsPage, setNewAlertsPage] = useState<number>(1);
+  const [resolvedAlertsPage, setResolvedAlertsPage] = useState<number>(1);
   const alertsPerPage = 5; 
 
   useEffect(() => {
@@ -58,8 +61,8 @@ function Alerts() {
   }, [newReadStatus]);
 
   // instnat render of alerts
-  const updateAlerts = async (alertName, id, newStatus) => {
-    const updatedAlerts: AlertData[] = alertList.map(alert => {
+  const updateAlerts = async (alertName: string, id: string, newStatus: "read" | "unread") => {
+    const updatedAlerts = alertList.map(alert => {
       if (alert.id === id) {
         return { ...alert, read: newStatus };
       } else {
@@ -87,7 +90,7 @@ function Alerts() {
 
       // Optionally update the status after confirmation
       const data = await response.json();
-      setReadStatus([alertName, id, newStatus]);
+      setReadStatus([alertName, id, newStatus].toString());
     } catch (err) {
       console.error(err);
 
@@ -99,12 +102,12 @@ function Alerts() {
     }
   };
 
-  const handleChange = (event, alertName, id) => {
-    const newStatus = event.target.value;
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, alertName: string, id: string) => {
+    const newStatus = event.target.value as "read" | "unread";
     updateAlerts(alertName, id, newStatus);
   };
 
-  const deleteAlert = async (id, log) => {
+  const deleteAlert = async (id: string, log: string) => {
     try {
       const response = await fetch('http://localhost:8080/alert/delete', {
         method: 'DELETE',
