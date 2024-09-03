@@ -15,8 +15,8 @@ const pool = new Pool({
 // which is a function that returns the invocation of pool.query() after logging the query
 // This will be required in the controllers to be the access point to the database
 module.exports = {
-  query: (text, params, callback) => {
+  query: (text: string, params: string[]) => {
     console.log('executed query', text);
-    return pool.query(text, params, callback);
+    return pool.query(text, params);
   }
 };
