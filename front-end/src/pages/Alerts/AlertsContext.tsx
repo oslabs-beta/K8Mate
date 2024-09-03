@@ -1,6 +1,18 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
 
-const AlertsContext = createContext();
+type AlertsContextsValues = {
+  diskSpace: DiskData[],
+  cpuData: CpuData[],
+  // runningPods: qweq,
+  podDetails: PodDetails[],
+  alertList: string[]
+  alertsUnreadStatus: Boolean
+  updateAlertsUnreadStatus: (status: Boolean) => void
+}
+
+const AlertsContext = createContext<AlertsContextsValues | undefined>(undefined);
+
+
 
 type AvailMem = {
   nodeName: string,
@@ -32,7 +44,7 @@ const AlertsProvider = ({ children }) => {
   const [ networkTraffic, setNetworkTraffic ] = useState<NetworkData[]>([])
   const [ diskSpace, setDiskSpace ] = useState<DiskData[]>([])
   const [ cpuData, setCpuData ] = useState<CpuData[]>([]);
-  const [ runningPods, setRunningPods ] = useState(null);
+  // const [ runningPods, setRunningPods ] = useState(null);
   const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); //array of pod names to compare
   const [ prevPodDetails, setPrevPodDetails ] = useState<PodDetails[]>([]);
   const [ alertList, setAlertList ] = useState<string[]>([]);
@@ -40,7 +52,7 @@ const AlertsProvider = ({ children }) => {
   // const hasFetchedCpuData = useRef(false);
 
   // Function to update alertsUnreadStatus
-  const updateAlertsUnreadStatus = (status) => {
+  const updateAlertsUnreadStatus = (status: Boolean) => {
     setAlertsUnreadStatus(status);
   };
 
@@ -447,12 +459,12 @@ const AlertsProvider = ({ children }) => {
     }
     fetchAlerts();
   }, [])
-
+  
 
   const contextValue = {
     diskSpace,
     cpuData,
-    runningPods,
+    // runningPods,
     podDetails,
     alertList,
     alertsUnreadStatus,

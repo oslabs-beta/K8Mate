@@ -31,14 +31,27 @@ function Alerts() {
       // toggleTheme
     } = context
 
+    const alertsContexts = useContext(AlertsContext);
+    if (!alertsContexts) {
+      throw new Error('Context not within provider')
+    }
+
+    const { 
+        // alertsUnreadStatus,
+        updateAlertsUnreadStatus,
+      } = alertsContexts;
+
+    
+
   const [alertList, setAlertList] = useState<AlertData[]>([]);
   const [newReadStatus, setReadStatus] = useState('');
   const [search, setSearch] = useState('');
 
-  const { 
-    alertsUnreadStatus,
-    updateAlertsUnreadStatus,
-  } = useContext(AlertsContext);
+  // const { 
+  //   alertsUnreadStatus,
+  //   updateAlertsUnreadStatus,
+  // } = useContext(AlertsContext);
+
 
 
   // pagination states
