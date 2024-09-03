@@ -28,7 +28,7 @@ const SettingsProvider = ({children}) => {
 
     /* ------------- Helper functions ------------- */
 
-    const updateTimezone = (zone) => {
+    const updateTimezone = (zone: string) => {
         setTimezone(zone)
     }
 

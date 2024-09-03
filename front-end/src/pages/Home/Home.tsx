@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import DashboardRow from "../../components/custom/DashboardRow/DashboardRow.jsx";
 import { Heading, Subheading } from "../../components/template/catalyst/heading.jsx";
-import { Divider } from "../../components/template/catalyst/divider";
+import { Divider } from "../../components/template/catalyst/divider.jsx";
 
 import {
   ChartBarIcon,
@@ -10,6 +10,13 @@ import {
   MapIcon,
 } from '@heroicons/react/20/solid'
 
+type Features = {
+  name: string,
+  description: string,
+  icon: JSX.Element,
+  cta: string,
+  link: string
+}[]
 
 import styles from "./Overview.module.css";
 
@@ -19,10 +26,10 @@ import { SecondaryFeatures } from '../../components/template/pocket/SecondaryFea
 
 function Home() {
   // State to track if there's any error
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Function to handle iframe load errors
-  const handleIframeError = () => {
+  const handleIframeError: () => void = () => {
     setErrorMessage(
       "Some content failed to load. Please check the connection or try again later."
     );
@@ -30,7 +37,7 @@ function Home() {
 
   const chartIcon = <ChartBarIcon className="text-orange-500"/>
 
-  const features = [
+  const features: Features = [
     {
       name: 'Reports',
       description:
