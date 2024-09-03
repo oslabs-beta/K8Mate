@@ -430,10 +430,13 @@ const AlertsProvider = ({ children }) => {
             'Content-Type': 'application/json'
           }
         })
+        if (!response.ok){
+          console.log('Failed Fetch');
+          return;
+        }
         if (response.ok) {
           const alerts = await response.json()
           const hasReadTrue = alerts.some(alert => alert.read ==='unread')
-
           if (hasReadTrue) {
             setAlertsUnreadStatus(hasReadTrue)
           } else {
