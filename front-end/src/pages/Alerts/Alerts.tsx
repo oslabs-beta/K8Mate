@@ -18,7 +18,18 @@ type AlertData = {
 
 function Alerts() {
 
-  const { timezone } = useContext(SettingsContext);
+  const context = useContext(SettingsContext);
+    if (!context) {
+      throw new Error('Context not within provider');
+    }
+
+    const {
+      timezone, 
+      // localTimezone, 
+      // updateTimezone,
+      // isDarkMode,
+      // toggleTheme
+    } = context
 
   const [alertList, setAlertList] = useState<AlertData[]>([]);
   const [newReadStatus, setReadStatus] = useState('');

@@ -24,13 +24,26 @@ export const metadata = {
 
 export default function Settings() {
 
+    // const {
+    //     timezone, 
+    //     localTimezone, 
+    //     updateTimezone,
+    //     isDarkMode,
+    //     toggleTheme,
+    // } = useContext(SettingsContext)
+
+    const context = useContext(SettingsContext);
+    if (!context) {
+      throw new Error('Context not within provider');
+    }
+
     const {
-        timezone, 
-        localTimezone, 
-        updateTimezone,
-        isDarkMode,
-        toggleTheme,
-    } = useContext(SettingsContext)
+      timezone, 
+      // localTimezone, 
+      updateTimezone,
+      isDarkMode,
+      toggleTheme
+    } = context
 
   const timezones = [
     "UTC",

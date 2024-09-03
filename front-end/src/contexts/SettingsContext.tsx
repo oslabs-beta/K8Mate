@@ -2,7 +2,15 @@ import react, { createContext, useState, useEffect, useRef } from 'react';
 import { DateTime } from "luxon";
 import React from 'react'
 
-const SettingsContext = createContext()
+type SettingsContexts = {
+    timezone: string,
+    localTimezone: string,
+    updateTimezone: (zone: string) => void,
+    isDarkMode: boolean,
+    toggleTheme: () => void
+}
+
+const SettingsContext = createContext<SettingsContexts | undefined>(undefined)
 
 
 const SettingsProvider = ({children}) => {
