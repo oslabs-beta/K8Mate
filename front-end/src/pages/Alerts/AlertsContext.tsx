@@ -12,8 +12,6 @@ type AlertsContextsValues = {
 
 const AlertsContext = createContext<AlertsContextsValues | undefined>(undefined);
 
-
-
 type AvailMem = {
   nodeName: string,
   memNum: number

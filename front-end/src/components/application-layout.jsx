@@ -53,7 +53,7 @@ import {
 import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
 import { Alert } from './custom/Alert/Alert'
-import { AlertsContext } from '../pages/Alerts/AlertsContext'
+import { AlertsContext } from '../pages/Alerts/AlertsContext.tsx'
 import { Logo } from './custom/Logo/Logo.jsx'
 
 
