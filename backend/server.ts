@@ -27,20 +27,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/alert', alertRouter);
 app.use('/cluster', clusterRouter);
 
-<<<<<<< HEAD
-// app.get('/pods', async (req, res) => {
-//   try {
-//     const response = await k8sApi.listPodForAllNamespaces();
-//     res.json(response.body);
-//   } catch (err) {
-//     res.status(500).send(err.message)
-//   }
-// })
-
 //Terminal 
 const wss = new WebSocketServer({ noServer: true });
 
 wss.on('connection', (ws: WebSocket) => {
+  console.log('connected to terminal');
   const shell = spawn('zsh', [], {
     name: 'xterm-color',
     cols: 80,
@@ -59,12 +50,10 @@ wss.on('connection', (ws: WebSocket) => {
 
   (ws as WebSocket).on('close', () => {
     shell.kill();
-  });
+  })
 });
 
-
-=======
->>>>>>> dev
+//Error Handling
 app.use((req: Request, res: Response) =>
     res.status(404).send("This is not the page you are looking for...")
   );

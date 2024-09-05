@@ -9,7 +9,7 @@ import { Select } from '../../components/template/catalyst/select.jsx';
 import { convertToMilitaryTime } from '../../hooks/useData.js';
 
 import { AlertsContext } from './AlertsContext.tsx';
-import { SettingsContext } from '../../contexts/SettingsContext.jsx';
+import { SettingsContext } from '../../contexts/SettingsContext.tsx';
 
 type AlertData = {
   id: string,

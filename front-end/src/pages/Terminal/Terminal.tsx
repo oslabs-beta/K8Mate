@@ -38,7 +38,7 @@ const Terminal = (): JSX.Element => {
 
   return (
     <>
-    <Heading>Terminal</Heading>
+    <Heading className={'terminal'} >Terminal</Heading>
     <div ref={terminalRef} style={{ 
       height: 1000, 
       width: '100%', 
