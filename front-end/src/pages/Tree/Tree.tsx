@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Button } from "../../components/template/catalyst/button";
-import { Heading } from '../../components/template/catalyst/heading';
+import { Button } from "../../components/template/catalyst/button.tsx";
+import { Heading } from '../../components/template/catalyst/heading.tsx';
 import { 
   ReactFlow, 
   Controls, 

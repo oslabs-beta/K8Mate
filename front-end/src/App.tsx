@@ -2,17 +2,15 @@ import { useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import React from "react"
 
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 import Home from './pages/Home/Home';
 import Alerts from './pages/Alerts/Alerts.tsx';
 import Dashboard from './pages/Dashboard/Dashboard.tsx';
 import Tree from './pages/Tree/Tree.tsx';
-import Notfound from './pages/Notfound/Notfound';
+import Notfound from './pages/Notfound/Notfound.tsx';
 import Flow from './pages/Flow/Flow';
-import Settings from './pages/Settings/Settings';
+import Settings from './pages/Settings/Settings.tsx';
 import Terminal from './pages/Terminal/Terminal.tsx';
 
 import { ApplicationLayout } from './components/application-layout'
