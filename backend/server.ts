@@ -78,3 +78,5 @@ server.on('upgrade', (request: any, socket: any, head: any) => {
     wss.emit('connection', ws, request);
   });
 });
+
+export default app
