@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config jest.config.js",
     "start": "node backend/server.ts",
     "server": "nodemon backend/server.ts",
     "client": "npm run dev --prefix front-end",
@@ -28,9 +28,14 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/pg": "^8.11.8",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
   }
 }
