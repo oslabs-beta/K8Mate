@@ -1,9 +1,0 @@
-.footerContainer {
-    height: 100px;
-    background-color: #7e7e7e; /* Background color for the footer */
-    color: rgb(0, 0, 0); /* Text color */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: auto;
-  }

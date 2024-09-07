@@ -1,8 +1,6 @@
 
 import React, { useState } from "react";
-import DashboardRow from "../../components/custom/DashboardRow/DashboardRow.jsx";
-import { Heading, Subheading } from "../../components/template/catalyst/heading.jsx";
-import { Divider } from "../../components/template/catalyst/divider.jsx";
+import { Divider } from "../../components/template/catalyst/divider.tsx";
 
 import {
   ChartBarIcon,
@@ -18,10 +16,8 @@ type Features = {
   link: string
 }[]
 
-import styles from "./Overview.module.css";
-
-import { Hero } from '../../components/template/pocket/Hero.jsx'
-import { SecondaryFeatures } from '../../components/template/pocket/SecondaryFeatures.jsx'
+import { Hero } from '../../components/template/pocket/Hero.tsx'
+import { SecondaryFeatures } from '../../components/template/pocket/SecondaryFeatures.tsx'
 
 
 function Home() {
@@ -67,7 +63,7 @@ function Home() {
 
   return (
     
-    <div className={styles.overviewContainer}>
+    <div className="space-y-4">
       <Hero
         className="!pt-20 !pb-0"
         header={`Super Kuber™`} 

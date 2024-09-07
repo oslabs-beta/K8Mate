@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal as XTermTerminal} from '@xterm/xterm';
-import { Heading } from '../../components/template/catalyst/heading';
+import { Heading } from '../../components/template/catalyst/heading.tsx';
 // import 'xterm/css/xterm.css'
 import '@xterm/xterm/css/xterm.css';
 
