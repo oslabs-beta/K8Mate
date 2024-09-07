@@ -51,6 +51,7 @@ import {
   GlobeAltIcon,
   BellAlertIcon,
   MapIcon,
+  CommandLineIcon
 } from '@heroicons/react/20/solid'
 import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
@@ -126,6 +127,12 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 <MapIcon />
                 <SidebarLabel>ReactFlowTest</SidebarLabel>
               </SidebarItem> */}
+              <SidebarItem as={NavLink} to="/terminal"  current={useLocation().pathname === "/terminal"} 
+              onClick={() => setShowSidebar(false)}
+              >
+                <CommandLineIcon />
+                <SidebarLabel>Terminal</SidebarLabel>
+              </SidebarItem>
 
               <SidebarItem as={NavLink} to="/settings"  current={useLocation().pathname === "/settings"} 
               onClick={() => setShowSidebar(false)}
@@ -134,12 +141,6 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
                 <SidebarLabel>Settings</SidebarLabel>
               </SidebarItem>
 
-              <SidebarItem as={NavLink} to="/terminal"  current={useLocation().pathname === "/terminal"} 
-              onClick={() => setShowSidebar(false)}
-              >
-                <Cog6ToothIcon />
-                <SidebarLabel>Terminal</SidebarLabel>
-              </SidebarItem>
 
 
 
