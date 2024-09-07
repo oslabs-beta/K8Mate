@@ -19,13 +19,16 @@ const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 
 const alertRouter = require('./router/alertRouter.ts');
 const clusterRouter = require('./router/clusterRouter.ts');
+const dbRouter = require('./router/dbRouter.ts');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//K8s routes
 app.use('/alert', alertRouter);
 app.use('/cluster', clusterRouter);
+app.use('/database', dbRouter);
 
 //Terminal 
 const wss = new WebSocketServer({ noServer: true });
@@ -78,5 +81,6 @@ server.on('upgrade', (request: any, socket: any, head: any) => {
     wss.emit('connection', ws, request);
   });
 });
+
 
 export default app

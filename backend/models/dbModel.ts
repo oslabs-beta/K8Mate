@@ -1,22 +1,32 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
-const PG_URI = 'postgresql://postgres.udydsqozqfrbosylddyp:hY80qs40iSJbpJ4G@aws-0-us-west-1.pooler.supabase.com:6543/postgres';
-
 // create a new pool here using the connection string above
-const pool = new Pool({
-  connectionString: PG_URI
-});
+let pool: typeof Pool | undefined;
 
-// Adding some notes about the database here will be helpful for future you or other developers.
-// Schema for the database can be found below:
-// https://github.com/CodesmithLLC/unit-10SB-databases/blob/master/docs/assets/images/schema.png
+function createPool(connectionString: string | undefined): void {
+  if (pool) {
+    pool.end(); // Close existing pool connections
+  }
+  pool = new Pool({
+    connectionString
+  });
+}
 
-// We export an object that contains a property called query,
-// which is a function that returns the invocation of pool.query() after logging the query
-// This will be required in the controllers to be the access point to the database
+function getPool(): typeof Pool {
+  if (!pool) { throw new Error('Database pool has not been initialized.'); }
+  return pool;
+}
+
+// Initial pool setup
+createPool(process.env.SUPABASE_URI);
+
 module.exports = {
   query: (text: string, params: string[]) => {
     console.log('executed query', text);
-    return pool.query(text, params);
+    return getPool().query(text, params);
+  },
+  updateConnectionString: (newConnectionString: string) => {
+    createPool(newConnectionString);
   }
 };
