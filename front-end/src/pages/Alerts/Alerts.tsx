@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 
-import { Avatar } from '../../components/template/catalyst/avatar.jsx';
-import { Button } from '../../components/template/catalyst/button.jsx';
-import { Heading, Subheading } from '../../components/template/catalyst/heading.jsx';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.jsx';
-import { Select } from '../../components/template/catalyst/select.jsx';
+import { Avatar } from '../../components/template/catalyst/avatar.tsx';
+import { Button } from '../../components/template/catalyst/button.tsx';
+import { Heading, Subheading } from '../../components/template/catalyst/heading.tsx';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.tsx';
+import { Select } from '../../components/template/catalyst/select.tsx';
 
-import { convertToMilitaryTime } from '../../hooks/useData.js';
+import { convertToMilitaryTime } from '../../hooks/useData.ts';
 
 import { AlertsContext } from './AlertsContext.tsx';
 import { SettingsContext } from '../../contexts/SettingsContext.tsx';
@@ -247,7 +247,11 @@ function Alerts() {
               </TableRow>
             ))
           ) : (
-            <p>No unread messages at this time</p>
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">
+                No unread messages at this time
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
@@ -331,7 +335,12 @@ function Alerts() {
               </TableRow>
             ))
           ) : (
-            <p>No resolved alerts at this time</p>
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">
+                No resolved alerts at this time
+              </TableCell>
+            </TableRow>
+            
           )}
         </TableBody>
       </Table>

@@ -1,5 +1,5 @@
 'use client'
-import { Avatar } from './template/catalyst/avatar.jsx'
+import { Avatar } from './template/catalyst/avatar.tsx'
 import { useState, useContext } from 'react';
 
 
@@ -10,9 +10,10 @@ import {
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
-} from './template/catalyst/dropdown.jsx'
+} from './template/catalyst/dropdown.tsx'
 
-import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/catalyst/navbar.jsx'
+import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from './template/catalyst/navbar.tsx'
+
 import {
   Sidebar,
   SidebarBody,
@@ -23,10 +24,11 @@ import {
   SidebarLabel,
   SidebarSection,
   SidebarSpacer,
-} from './template/catalyst/sidebar.jsx'
-import { SidebarLayout } from './template/catalyst/sidebar-layout.jsx'
+} from './template/catalyst/sidebar.tsx'
 
-import GithubIcon from './custom/GithubIcon/GithubIcon.jsx'
+import { SidebarLayout } from './template/catalyst/sidebar-layout.tsx'
+
+import GithubIcon from './custom/GithubIcon/GithubIcon.tsx'
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -52,9 +54,8 @@ import {
 } from '@heroicons/react/20/solid'
 import { Link, NavLink, useLocation } from 'react-router-dom'  // Import NavLink from react-router-dom
 
-import { Alert } from './custom/Alert/Alert'
-import { AlertsContext } from '../pages/Alerts/AlertsContext.tsx'
-import { Logo } from './custom/Logo/Logo.jsx'
+import { AlertsContext } from '../pages/Alerts/AlertsContext'
+import { Logo } from './custom/Logo/Logo.tsx'
 
 
 

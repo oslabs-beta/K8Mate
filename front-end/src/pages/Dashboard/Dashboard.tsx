@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import DashboardRow from '../../components/custom/DashboardRow/DashboardRow.jsx';
-import { Heading } from '../../components/template/catalyst/heading.jsx';
+import React, { useState } from 'react';
+import DashboardRow from '../../components/custom/DashboardRow/DashboardRow.tsx';
+import { Heading } from '../../components/template/catalyst/heading.tsx';
 import styles from './Dashboard.module.css';
 
 function Dashboard(props) {

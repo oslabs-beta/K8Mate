@@ -1,8 +1,8 @@
-import react, { createContext, useState, useEffect, useRef } from 'react';
+import react, { createContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { DateTime } from "luxon";
 import React from 'react'
 
-type SettingsContexts = {
+type SettingsContextType = {
     timezone: string,
     localTimezone: string,
     updateTimezone: (zone: string) => void,
@@ -10,10 +10,13 @@ type SettingsContexts = {
     toggleTheme: () => void
 }
 
-const SettingsContext = createContext<SettingsContexts | undefined>(undefined)
+const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
 
+interface SettingsProviderProps {
+    children: ReactNode; // ReactNode type covers all renderable children
+  }
 
-const SettingsProvider = ({children}) => {
+const SettingsProvider: React.FC<SettingsProviderProps> = ({children}) => {
     const [timezone, setTimezone] = useState<string>(DateTime.local().zoneName)
     const [localTimezone, setLocalTimezone] = useState<string>(DateTime.local().zoneName)
 
@@ -54,7 +57,7 @@ const SettingsProvider = ({children}) => {
         });
     };
 
-    const contextValue = {
+    const contextValue: SettingsContextType = {
         timezone,
         localTimezone,
         updateTimezone,
