@@ -22,3 +22,8 @@ export type k8scontroller = {
   getNodes: RequestHandler,
   getServices: RequestHandler
 }
+
+export type dbcontroller = {
+  changeFile: RequestHandler,
+  addTables: RequestHandler
+}
