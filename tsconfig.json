@@ -18,7 +18,7 @@
       "jsx": "react-jsx"
     },
     "include": ["src/**/*","backend/**/*.ts", "backend/**/*.test.ts", "declarations.d.ts"],
-    "references": [{ "path": "./tsconfig.node.json" }]
+    
   }
 
 //   {
