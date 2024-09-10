@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
-import { Dialog, DialogTitle, DialogBody, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog'
+import React, { createContext, useState, useEffect } from 'react';
+import { Dialog, DialogTitle, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog'
 import { Button } from '../../components/template/catalyst/button'
 
 type AlertsContextsValues = {
@@ -43,7 +43,7 @@ const AlertsProvider = ({ children }) => {
   const [ networkTraffic, setNetworkTraffic ] = useState<NetworkData[]>([])
   const [ diskSpace, setDiskSpace ] = useState<DiskData[]>([])
   const [ cpuData, setCpuData ] = useState<CpuData[]>([]);
-  const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); //array of pod names to compare
+  const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); 
   const [ prevPodDetails, setPrevPodDetails ] = useState<PodDetails[]>([]);
   const [ alertList, setAlertList ] = useState<string[]>([]);
   const [ alertsUnreadStatus, setAlertsUnreadStatus ] = useState<Boolean>(false)
@@ -223,7 +223,6 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
-
   //pod restart POST
   const podRestartAlert = async (restartedPod, restartedPodID) => {
     try {
@@ -309,21 +308,25 @@ const AlertsProvider = ({ children }) => {
     setShowAlert(true);
   }
 
-  // network traffic
+  //query current incoming and outgoing traffic
   useEffect(() => {
     const networkTrafficData = async () => {
       try {
-        const query = encodeURIComponent('(irate(node_network_receive_bytes_total[1m]) + irate(node_network_transmit_bytes_total[1m]))');
+        const query = encodeURIComponent(`sum by (instance) (
+          rate(node_network_receive_bytes_total{device!="lo"}[1m]) +
+          rate(node_network_transmit_bytes_total{device!="lo"}[1m])
+        )`);
         const response = await fetch(`http://localhost:9090/api/v1/query?query=${query}`);
         if (!response.ok){
           console.log('Failed Fetch');
           return
         }
         const data = await response.json();
+        console.log('NETWORK DATA', data)
         if (data.status === 'success' && data.data.result.length > 0) {
           const trafficData: NetworkData[] = data.data.result.map(result => ({
             nodeName: result.metric.instance,
-            bitsPerSecond: parseFloat(result.value[1]) * 8 
+            bitsPerSecond: Number(result.value[1])
           }));
           setNetworkTraffic(trafficData);
         } else {
@@ -344,9 +347,12 @@ const AlertsProvider = ({ children }) => {
     networkTraffic.forEach(traffic => {
       if (traffic.bitsPerSecond > trafficThreshold) {
         sendNetworkTrafficAlert(traffic.bitsPerSecond, traffic.nodeName);
+        handleNetworkTrafficAlert(traffic.bitsPerSecond, traffic.nodeName);
       }
     });
   }, [networkTraffic]);
+
+  //sends network traffic alert message to backend
   
   const sendNetworkTrafficAlert = async (bitsPerSecond, nodeName) => {
     try {
@@ -358,7 +364,7 @@ const AlertsProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          category: 'Nodes',
+          category: 'Network',
           name: nodeName,
           log: `High network traffic detected at ${formattedBitsRate} bits per second on ${nodeName} on ${formattedDate}`
         })
@@ -373,6 +379,12 @@ const AlertsProvider = ({ children }) => {
     }
   };
 
+  //handler for network traffic popup
+
+  const handleNetworkTrafficAlert = (bits, nodeName) => {
+    setAlertMessage(`High network traffic detected at ${bits} bits per second on ${nodeName}`);
+    setShowAlert(true);
+  }
 
  //query current disk space
 
@@ -477,7 +489,6 @@ const AlertsProvider = ({ children }) => {
   const contextValue = {
     diskSpace,
     cpuData,
-    // runningPods,
     podDetails,
     alertList,
     alertsUnreadStatus,
