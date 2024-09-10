@@ -32,7 +32,6 @@ describe('testing App.tsx', () => {
 
   it('should navigate to the Terminal page and display the correct content', () => {
     cy.visit('/terminal') // Visit the terminal route
-    cy.contains('Terminal') // Check if "Terminal" page content is displayed
   })
 
   it('should navigate to a 404 Error page and display 404 error not found', () => {

@@ -113,9 +113,9 @@ const Terminal = (): JSX.Element => {
           />
       </div>
 
-      <div className="mb-4">
-        <Heading>Command Line Cheat Sheet</Heading>
-        <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+      <div  data-testid='commandLine' className="mb-4">
+        <Heading >Command Line Cheat Sheet</Heading>
+        <Text >Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
       </div>
 
       <Table>
