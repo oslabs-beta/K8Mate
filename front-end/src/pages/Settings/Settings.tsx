@@ -1,8 +1,9 @@
+// import libraries/frameworks
 import React, { useState, useEffect, useContext,FormEvent } from 'react';
-
 import { DateTime } from "luxon";
 import moment from "moment-timezone";
 
+// import components for layout
 import { Button } from "../../components/template/catalyst/button.tsx";
 import { Checkbox, CheckboxField } from "../../components/template/catalyst/checkbox.tsx";
 import { Divider } from "../../components/template/catalyst/divider.tsx";
@@ -10,22 +11,22 @@ import { Description, Label } from "../../components/template/catalyst/fieldset.
 import { Heading, Subheading } from "../../components/template/catalyst/heading.tsx";
 import { Input } from "../../components/template/catalyst/input.tsx";
 import { Select } from "../../components/template/catalyst/select.tsx";
-import { Text } from "../../components/template/catalyst/text.tsx";
+import { Text, Code } from "../../components/template/catalyst/text.tsx";
 import { Textarea } from "../../components/template/catalyst/textarea.tsx";
 import { Switch, SwitchField } from "../../components/template/catalyst/switch.tsx";
 
+// import helpers
 import { getTimezoneOffset } from "../../hooks/useData.ts";
-
 import { SettingsContext } from '../../contexts/SettingsContext'
-
+import * as settingsService from '../../services/settingsService.js'
 
 // types for context values 
-
 interface SettingsContextType {
   timezone: string;
   updateTimezone: (zone:string) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
+  uri: string;
 }
 
 export const metadata = {
@@ -33,6 +34,8 @@ export const metadata = {
 };
 
 export default function Settings() {
+    const [message, setMessage] = useState<string>('')
+
 
     const context = useContext(SettingsContext) as SettingsContextType;
     if (!context) {
@@ -41,10 +44,10 @@ export default function Settings() {
 
     const {
       timezone, 
-      // localTimezone, 
       updateTimezone,
       isDarkMode,
-      toggleTheme
+      toggleTheme,
+      uri,
     } = context
 
   const timezones: string[] = [
@@ -88,10 +91,22 @@ export default function Settings() {
   ];
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    console.log('form submitted')
     e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const selectedTimezone = (form.elements.namedItem('timezone') as HTMLSelectElement).value;
-    console.log('Selected Timezone:', selectedTimezone);
+    setMessage('Settings saved')
+
+
+    const form = e.target as HTMLFormElement; // Cast the event target to an HTMLFormElement
+
+    // Create a new FormData object from the form
+    const formData = new FormData(form);
+
+    // Convert FormData to a plain object
+  const formObject = Object.fromEntries(formData.entries());
+    // Fetch inputs from formData using their names
+    const selectedTimezone = formData.get('timezone') as string; // Ensure the input name matches the form field
+    const uri = formData.get('uri') as string; // Ensure the input name matches the form field
+    settingsService.update(formObject)
     updateTimezone(selectedTimezone)
   }
 
@@ -127,12 +142,7 @@ export default function Settings() {
             name="timezone"
             defaultValue={timezone}
           >
-            {/* <option key={0} value={localTimezone}>
-                {localTimezone} -- Local:{" "}
-                {DateTime.now().setZone(localTimezone).toFormat("HH:mm")} --{" "}
-                {getTimezoneOffset(localTimezone)}
-            </option> */}
-
+      
             {timezones.map((zone, ind) => (
               <option key={ind+1} value={zone}>
                 {zone} -- Local:{" "}
@@ -146,11 +156,25 @@ export default function Settings() {
 
       <Divider className="my-10" soft />
 
+      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+        <div className="space-y-1">
+          <Subheading>Database</Subheading>
+          <Text>Enter your database link. At this time we only support SQL database links</Text>
+        </div>
+        <div>
+          <Input type="text" name="uri" defaultValue={uri} />
+          <Text className="flex flex-wrap pt-2">ex: postgresql://<Code>username</Code>:<Code>password</Code>@<Code>host</Code>/<Code>database</Code></Text>
+        </div>
+      </section>
+
+      <Divider className="my-10" soft />
+
       <div className="flex justify-end gap-4">
-        {/* <Button type="reset" plain >
-          Reset
-        </Button> */}
+        <Text className ="flex justify-center items-center">{message}</Text>
+        
         <Button data-testid='submit' type="submit" color="superPurple">Save changes</Button>
+        
+        
       </div>
     </form>
   );
