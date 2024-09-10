@@ -172,7 +172,7 @@ export default function Settings() {
       <div className="flex justify-end gap-4">
         <Text className ="flex justify-center items-center">{message}</Text>
         
-        <Button type="submit" color="superPurple">Save changes</Button>
+        <Button data-testid='submit' type="submit" color="superPurple">Save changes</Button>
         
         
       </div>

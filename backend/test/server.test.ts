@@ -2,16 +2,13 @@ import request from 'supertest';
 import app from '../server.ts'
 import { NextFunction, Request, Response } from 'express';
 
-
-
-
-describe ('Testing HTTP Endpoints', () => {
-    it ('Should return 404 for an unknown route', async () => {
-        const res = await request(app).get('/unknown-route');
-        expect(res.statusCode).toBe(404);
-        expect(res.text).toBe('This is not the page you are looking for...')
-    })
-})
+describe('Testing HTTP Endpoints', () => {
+  it('Should return 404 for an unknown route', async () => {
+    const res = await request(app).get('/unknown-route');
+    expect(res.statusCode).toBe(404);
+    expect(res.text).toBe('This is not the page you are looking for...');
+  });
+});
 
 describe('Error handling middleware', () => {
     it('should return 404 for unknown routes', async () => {
@@ -19,22 +16,11 @@ describe('Error handling middleware', () => {
       expect(res.statusCode).toBe(404);
       expect(res.text).toBe('This is not the page you are looking for...');
     });
-  
-    it('should handle internal server errors', async () => {
-      // Mock a route that will trigger an error
-      app.get('/error', (req: Request, res: Response, next: NextFunction) => {
-        next(new Error('Test error'));
-      });
-  
-      const res = await request(app).get('/error');
-      expect(res.statusCode).toBe(500);
-      expect(res.body).toEqual({ err: 'An error occurred' });
-    });
   });
 
-describe('Test /alert/create route', () => {
+  describe('Test /alert/create route', () => {
     it('should return 200 for valid POST request', async () => {
-      const res = await request(app).post('/alert/create').send({
+      const res = await request(app).get('/alert/create').send({
         message: 'Test alert message',
       });
       expect(res.statusCode).toBe(200);

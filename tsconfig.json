@@ -17,7 +17,7 @@
       "noEmit": true,
       "jsx": "react-jsx"
     },
-    "include": ["src/**/*","backend/**/*.ts", "backend/**/*.test.ts", "declarations.d.ts"],
+    "include": ["src/**/*","backend/**/*.ts", "backend/**/*.test.ts", "declarations.d.ts", "cypress"],
     
   }
 

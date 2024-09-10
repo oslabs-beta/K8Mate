@@ -34,11 +34,11 @@ function Dashboard(props) {
 
   return (
     <div className={styles.dashboardContainer}>
-      <div className="flex items-end justify-between gap-4">
+      <div data-testid='dashboard' className="flex items-end justify-between gap-4">
         <Heading>Dashboard</Heading>
       </div>
 
-      <select value={graphState} onChange={handleChangeGraph} className={styles.customSelect}>
+      <select id='names' value={graphState} onChange={handleChangeGraph} className={styles.customSelect}>
         <option value='default'>All Graphs</option>
         <option value='Node Charts'>Nodes Charts</option>
         <option value='Cluster Charts'>Cluster Charts</option>
