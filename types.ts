@@ -23,7 +23,7 @@ export type k8scontroller = {
   getServices: RequestHandler
 }
 
-export type dbcontroller = {
+export type settingcontroller = {
   changeFile: RequestHandler,
   addTables: RequestHandler
 }

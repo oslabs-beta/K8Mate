@@ -3,8 +3,10 @@ const path = require('path');
 
 const db = require('../models/dbModel.ts')
 import { Request, Response, NextFunction } from 'express';
-import { dbcontroller } from '../../types.ts';
+import { settingcontroller } from '../../types.ts';
 
+
+// Helper functions
 function updateEnvFile(key: string, value: string): void {
   const envFilePath = path.resolve(__dirname, '../../.env');
   let envContent = fs.readFileSync(envFilePath, 'utf8');
@@ -23,16 +25,20 @@ function updateEnvFile(key: string, value: string): void {
   console.log(`Updated ${key} in .env file.`);
 }
 
-const dbController: dbcontroller = { changeFile: ()=>{}, addTables: ()=>{} }
 
-dbController.changeFile = (req: Request, res: Response, next: NextFunction) => {
-  const { uri } = req.body;
+// Controllers
+const settingController: settingcontroller = { changeFile: ()=>{}, addTables: ()=>{} }
+
+settingController.changeFile = (req: Request, res: Response, next: NextFunction) => {
+  const { timezone, uri } = req.body;
   updateEnvFile('SUPABASE_URI', uri);
+  updateEnvFile('timezone', timezone);
   db.updateConnectionString(uri);
   return next();
 }
 
-dbController.addTables = async (req: Request, res: Response, next: NextFunction) => { 
+
+settingController.addTables = async (req: Request, res: Response, next: NextFunction) => { 
   console.log('inside add tables');
   try { await db.query('SELECT 1 FROM alerts LIMIT 1'); } 
   catch (err) {
@@ -70,4 +76,4 @@ dbController.addTables = async (req: Request, res: Response, next: NextFunction)
   return next();
 }
 
-module.exports = dbController;
+module.exports = settingController;
