@@ -95,6 +95,7 @@ const Tree = (): JSX.Element => {
   const [ edges, setEdges ] = useState<Edge[]>(initialEdges);
   const [ visibleEdges, setVisibleEdges ] = useState<Set<string>>(new Set()); 
   const [firstLoad, setFirstLoad] = useState<boolean>(true); 
+  const [selectedNodeId, setSelectedNodeId] = useState<string[]>([]);
 
   // Grab the current cluster state when the button is pressed
   const loadCluster = async () => {
@@ -147,14 +148,10 @@ const Tree = (): JSX.Element => {
       setK8sServices(servicesNodes);
       setK8sNodes(nodeNodes);
   
-      const xCoordinatesCalc = (num: number): number => {
-        return (num * 350) + 50;
-      }
-  
-      const nodesForFlow: Node[] = k8sNodesList.map((node, index) => ({
+      const nodesForFlow: Node[] = nodeNodes.map((node, index) => ({
         id: node.name,
-        data: { label: `Worker Node: ${node.name}` },
-        position: { x: xCoordinatesCalc(index), y: 400},
+        data: { label: `Worker Node: ${node.name}`, data: node.data },
+        position: { x: (index * 350) + 50, y: 400},
         style: { 
           border: '2px solid #2563eb', 
           padding: 10,
@@ -170,16 +167,15 @@ const Tree = (): JSX.Element => {
 
       const groupedPodsCache: Record<string, ClusterElement[]> = {};
 
-      k8sNodesList.forEach((workerNode) => {
+      nodeNodes.forEach((workerNode) => {
         const workerNodeName = workerNode.name;
         if (!groupedPodsCache[workerNodeName]) {
           groupedPodsCache[workerNodeName] = [];
-        } 
-        groupedPodsCache[workerNodeName] = k8sPodsList.filter((pod) => pod.data.nodeName === workerNodeName)
+        }
+        groupedPodsCache[workerNodeName] = podsNodes.filter((pod) => pod.data.nodeName === workerNodeName)
       })
   
       const podsForFlow: Node[] = [];
-    
       Object.keys(groupedPodsCache).forEach((nodeName, nodeIndex) => {
         groupedPodsCache[nodeName].forEach((pod, podIndex) => {
           const xPosition = nodeIndex * 400 + 70;  
@@ -187,18 +183,19 @@ const Tree = (): JSX.Element => {
     
           podsForFlow.push({
             id: pod.name,
-            data: { label: `Pod: ${pod.name}`},
+            data: { label: `Pod: ${pod.name}`, data: pod.data},
             position: { x: xPosition, y: yPosition },
             style: { 
               border: '1px solid black', 
               padding: 10, 
               fontSize: 7,
-              backgroundColor: 'green'
+              backgroundColor: 'green',
+              boxShadow: '0px 0px',
              },
           });
         });
       });
-  
+
       setNodes(prev => [...prev, ...nodesForFlow, ...podsForFlow]);
     }
   }, [k8sCluster, firstLoad]); 
@@ -243,34 +240,36 @@ const Tree = (): JSX.Element => {
         .filter((service) => connectedServices.has(service.name))
         .map((service, index) => ({
           id: service.name,
-          data: { label: `Service: ${service.name}` },
+          data: { label: `Service: ${service.name}`, data: service.data},
           position: { x: 1200, y: 400 + index * 75 },
           style: { 
             border: '1px solid black', 
             padding: 10, 
             fontSize: 7,
             backgroundColor: 'orange',
+            boxShadow: '0px 0px',
            },
         }))
 
       const containerEdges: Edge[] = [];
       const containerNodes: Node[] = k8sPodsList.flatMap((pod, podIndex) => {
         return pod.data.containers.map((container, containerIndex) => {
-          const edgeId = `p-c-${pod.name}-${container.name}`;
+          const edgeId = `p-c-${pod.name}-${container}`;
           containerEdges.push({
             id: edgeId,
             source: pod.name,
-            target: container.name,
+            target: container,
           });
           return {
-            id: container.name,
-            data: { label: `Container: ${container.name}` },
+            id: container,
+            data: { label: `Container: ${container}` },
             position: { x: -200, y: 400 + (podIndex * 75) + (containerIndex * 75) },
             style: {
               border: '1px solid black', 
               padding: 10, 
               fontSize: 7,
               backgroundColor: 'white',
+              boxShadow: '0px 0px',
             },
           };
         });
@@ -304,21 +303,70 @@ const Tree = (): JSX.Element => {
     [],
   );
 
-  const onNodeClick = useCallback((event, node) => {
+  const onNodeEnter = useCallback((event, node) => {
     setVisibleEdges((prevVisibleEdges) => {
       const newVisibleEdges = new Set(prevVisibleEdges);
+      setSelectedNodeId([node.id, 'glow']);
       edges.forEach((edge) => {
         if (edge.source === node.id || edge.target === node.id) {
-          if (newVisibleEdges.has(edge.id)) {
-            newVisibleEdges.delete(edge.id);
-          } else {
-            newVisibleEdges.add(edge.id);
-          }
+          newVisibleEdges.add(edge.id);
         }
       });
       return newVisibleEdges;
     });
   }, [edges]);
+
+  const onNodeLeave = useCallback((event, node) => {
+    setVisibleEdges((prevVisibleEdges) => {
+      const newVisibleEdges = new Set(prevVisibleEdges);
+      setSelectedNodeId([node.id, 'unglow']);
+      edges.forEach((edge) => {
+        if (edge.source === node.id || edge.target === node.id) {
+          newVisibleEdges.delete(edge.id);
+        }
+      });
+      return newVisibleEdges;
+    });
+  }, [edges]);
+
+  const onNodeClick = (event, node) => {
+    const category = node.data.label.split(':')[0];
+    const information: string[] = [];
+    switch (category) {
+      case 'Pod':
+        console.log('is a pod');
+        for(const key in node.data.data) {
+          if (key != 'containers' && key != 'labels')
+            information.push(`${key}: ${node.data.data[key]}`);
+          else if (key === 'containers') {
+            let str: string = 'Containers:';
+            node.data.data[key].forEach(ele => {
+              str+= ` ${ele},`
+            })
+
+            information.push(str.slice(0, -1));
+          }
+        };
+        break;
+      case 'Worker Node':
+        console.log('is a node');
+        for(const key in node.data.data) {
+            information.push(`${key}: ${node.data.key}`);
+        };
+        break;
+      case 'Service':
+        console.log('is a service');
+        for(const key in node.data.data) {
+          information.push(`${key}: ${node.data.key}`);
+        }
+        break;
+      default:
+        console.log('is a', category);
+    }
+    
+    console.log(category, node);
+    console.log('information:', information);
+  };
 
   const updatedEdges: Edge[] = edges.map((edge) => ({
     ...edge,
@@ -332,11 +380,22 @@ const Tree = (): JSX.Element => {
     },
   }));
 
+  const updatedNodes: Node[] = nodes.map((node) => ({
+      ...node,
+      style: {
+        ...node.style,
+        boxShadow: 
+        selectedNodeId[0] == node.id && selectedNodeId[1] === 'glow'?
+        '3px 3px 5px white, -3px -3px 5px white, 3px -3px 5px white, -3px 3px 5px white'
+        : '0px 0px'
+      }
+  }));
+
   const handleSetClusterFromHistory = (pods: ClusterElement[], nodes: ClusterElement[], services: ClusterElement[]) => {
   
     const newNodes: Node[] = nodes.map((node, index) => ({
       id: node.name,
-      data: { label: `Worker Node: ${node.name}` },
+      data: { label: `Worker Node: ${node.name}`, data: node.data},
       position: { x: index * 350 + 50, y: 400},
       style: { 
         border: '2px solid #2563eb', 
@@ -347,7 +406,7 @@ const Tree = (): JSX.Element => {
         color: 'black',
         fontSize: 15,
         fontWeight: 'bold',
-        zIndex: -1   
+        zIndex: -1
       },
     }));
 
@@ -371,27 +430,28 @@ const Tree = (): JSX.Element => {
   
         newPods.push({
           id: pod.name,
-          data: { label: `Pod: ${pod.name}`},
+          data: { label: `Pod: ${pod.name}`, data: pod.data},
           position: { x: xPosition, y: yPosition },
           style: { 
             border: '1px solid black', 
             padding: 10, 
             fontSize: 7,
-            backgroundColor: 'green'
+            backgroundColor: 'green',
+            boxShadow: '0px 0px',
            },
         });
       });
     });
-
     const newServices: Node[] = services.map((service, index) => ({
       id: service.name,
-      data: { label: `Service: ${service.name}` },
+      data: { label: `Service: ${service.name}`, data: service.data },
       position: { x: 1200, y: 400 + index * 75 },
       style: { 
         border: '1px solid black', 
         padding: 10, 
         fontSize: 7,
         backgroundColor: 'orange',
+        boxShadow: '0px 0px',
         },
     }));
 
@@ -404,26 +464,26 @@ const Tree = (): JSX.Element => {
     const newContainerEdges: Edge[] = [];
     const newContainerNodes: Node[] = pods.flatMap((pod, podIndex) => {
       return pod.data.containers.map((container, containerIndex) => {
-        const edgeId = `p-c-${pod.name}-${container.name}`
+        const edgeId = `p-c-${pod.name}-${container}`
         newContainerEdges.push({
           id: edgeId,
           source: pod.name,
-          target: container.name,
+          target: container,
         });
         return {
-          id: container.name,
-          data: { label: `Container: ${container.name}` },
+          id: container,
+          data: { label: `Container: ${container}` },
           position: { x: -200, y: 400 + (podIndex * 75) + (containerIndex * 75) },
           style: {
             border: '1px solid black', 
             padding: 10, 
             fontSize: 7,
             backgroundColor: 'white',
+            boxShadow: '0px 0px',
           },
         };
       });
     });
-
     const newPodEdges: Edge[] = pods.map((pod, index) => ({
       id: `el3-${index}`,
       source: pod.data.nodeName,
@@ -471,20 +531,20 @@ const Tree = (): JSX.Element => {
   }
 
   const handleSnapshot = async () => {
-    const pods: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'pod');
-    const services: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'service');
-    const nodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'node');
+    // const pods: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'pod');
+    // const services: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'service');
+    // const nodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'node');
     try {
       const response = await fetch('http://localhost:8080/cluster/postAll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          pods: pods,
-          nodes: nodes,
-          services: services,
-        })
+        }
+        // body: JSON.stringify({
+        //   pods: pods,
+        //   nodes: nodes,
+        //   services: services,
+        // })
       });
       if (response.ok) {
         console.log('Snapshot taken');
@@ -503,13 +563,16 @@ const Tree = (): JSX.Element => {
         <Button onClick={handleSnapshot}>Take Snapshot</Button>
         {!firstLoad ? (  
           <ReactFlow
-            nodes={nodes}
+            nodes={updatedNodes}
             edges={updatedEdges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            elementsSelectable={true}
             defaultViewport={defaultViewport}
             minZoom={0.2}
             maxZoom={4}
+            onNodeMouseEnter={onNodeEnter}
+            onNodeMouseLeave={onNodeLeave}
             onNodeClick={onNodeClick}
           >
             <Background />

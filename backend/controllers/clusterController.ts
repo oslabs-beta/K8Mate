@@ -23,7 +23,9 @@ clusterController.postSnapshot = (req: Request, res: Response, next: NextFunctio
   res.locals.pods.map((podObject: any) => {
     const { name, namespace, uid, creationTimestamp, labels } = podObject.metadata;
     const { nodeName, containers } = podObject.spec;
-    info.pods.push({category: 'pods', name, uid, creationTimestamp, data: {namespace, nodeName, labels, containers}})
+    const containerArray: string[] = [];
+    containers.forEach((ele: any) => { containerArray.push(ele.name); })
+    info.pods.push({category: 'pods', name, uid, creationTimestamp, data: {namespace, nodeName, labels, containers: containerArray}})
   });
 
   //put all current nodes information from response object into info object
@@ -81,7 +83,9 @@ clusterController.postPods = async (req: Request, res: Response, next: NextFunct
     res.locals.pods.map((podObject: any) => {
       const { name, namespace, uid, creationTimestamp, labels } = podObject.metadata;
       const { nodeName, containers } = podObject.spec;
-      const values = ['pod', name, uid, creationTimestamp, {namespace, nodeName, labels, containers}];
+      const containerArray: string[] = [];
+      containers.forEach((ele: any) => { containerArray.push(ele.name); })
+      const values = ['pod', name, uid, creationTimestamp, {namespace, nodeName, labels, containers: containerArray}];
 
       alertQuery(qstring, values)
     });
