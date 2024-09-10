@@ -1,9 +1,10 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
+import { Dialog, DialogTitle, DialogBody, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog'
+import { Button } from '../../components/template/catalyst/button'
 
 type AlertsContextsValues = {
   diskSpace: DiskData[],
   cpuData: CpuData[],
-  // runningPods: qweq,
   podDetails: PodDetails[],
   alertList: string[]
   alertsUnreadStatus: Boolean
@@ -42,21 +43,19 @@ const AlertsProvider = ({ children }) => {
   const [ networkTraffic, setNetworkTraffic ] = useState<NetworkData[]>([])
   const [ diskSpace, setDiskSpace ] = useState<DiskData[]>([])
   const [ cpuData, setCpuData ] = useState<CpuData[]>([]);
-  // const [ runningPods, setRunningPods ] = useState(null);
   const [ podDetails, setPodDetails] = useState<PodDetails[]>([]); //array of pod names to compare
   const [ prevPodDetails, setPrevPodDetails ] = useState<PodDetails[]>([]);
   const [ alertList, setAlertList ] = useState<string[]>([]);
-  const [ alertsUnreadStatus, setAlertsUnreadStatus] = useState<Boolean>(false)
-  // const hasFetchedCpuData = useRef(false);
+  const [ alertsUnreadStatus, setAlertsUnreadStatus ] = useState<Boolean>(false)
+  const [ alertMessage, setAlertMessage ] = useState<string>("");
+  const [ showAlert, setShowAlert ] = useState<Boolean>(false);
 
   // Function to update alertsUnreadStatus
   const updateAlertsUnreadStatus = (status: Boolean) => {
     setAlertsUnreadStatus(status);
   };
 
- 
-  // alerts requests to backend
-  //cpu POST
+  //query for current memeory on each worker node
 
   useEffect(() => {
     const availMem = async () => {
@@ -68,7 +67,6 @@ const AlertsProvider = ({ children }) => {
           return
         }
         const data = await response.json();
-        // console.log("READ THIS SHIT HERE", data)
         const memData: AvailMem[] = data.data.result.map((mem) => {
           return {
             nodeName: mem.metric.instance,
@@ -91,20 +89,23 @@ const AlertsProvider = ({ children }) => {
     availableMemory.forEach(mem => {
       if (mem.memNum < memoryThreshold) {
         sendAvailMemAlert(mem.memNum, mem.nodeName);
+        handleMemAlert(mem.nodeName, mem.memNum)
       }
     });
   }, [availableMemory]);
 
+  //available memory POST request
+
   const sendAvailMemAlert = async (memoryNumber, nodeName) => {
     try {
       const formattedDate = new Date().toLocaleString();
-      const response = await fetch('http://localhost:8000/alert/create', {
+      const response = await fetch('http://localhost:8080/alert/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          category: 'Node',
+          category: 'Memory',
           name: nodeName,
           log: `Low memory detected on node ${nodeName} at ${formattedDate}. Current available memory is ${memoryNumber}.`
         })
@@ -119,7 +120,50 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
+  //alert popup for available memory
 
+  const handleMemAlert = (nodeName, memory) => {
+    setAlertMessage(`Low memory detected on node ${nodeName}. Current available memory is ${memory}.`);
+    setShowAlert(true);
+  }
+
+  //query current cpu stats
+
+  useEffect(() => {
+    const cpuUsage = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
+        if (!response.ok){
+          console.log('Failed Fetch');
+          return
+        }
+        const data = await response.json();
+        const cpuUsagePerNode: CpuData[] = data.data.result.map((cpuUse) => ({
+          nodeName: cpuUse.metric.nodename,
+          cpuUsage: cpuUse.value[1],
+        }))
+        setCpuData(cpuUsagePerNode);
+      } catch (err: unknown) {
+        console.log(err);
+      }
+    };
+    const intervalID = setInterval(() => {
+      cpuUsage()
+    }, 5000)
+    return () => clearInterval(intervalID);
+  }, []);
+
+  useEffect(() => {
+    const cpuThreshold = 60;
+    cpuData.forEach(cpuValue => {
+      if (cpuValue.cpuUsage > cpuThreshold) {
+        sendCpuAlert(cpuValue.cpuUsage, cpuValue.nodeName)
+        handleCpuAlert(cpuValue.cpuUsage, cpuValue.nodeName)
+      }
+    })
+  }, [cpuData])
+  
+  //sends cpu alert message to backend
 
   const sendCpuAlert = async (cpuUsageValue, nodeName) => {
     try {
@@ -146,6 +190,14 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
+  //handler for cpu alert popup
+
+  const handleCpuAlert = (cpuUsageValue, nodeName) => {
+    setAlertMessage(`CPU usage is high: ${nodeName} is at ${cpuUsageValue}%`);
+    setShowAlert(true);
+  }
+
+
   //pod fail POST
   const podFailedAlert = async (failedPod, failedPodID) => {
     try {
@@ -155,7 +207,6 @@ const AlertsProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          // pod id, previous pod name, alert log, category: pods
           id: failedPodID,
           category: 'Pod',
           name: failedPod,
@@ -182,7 +233,6 @@ const AlertsProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          // pod id, previous pod name, alert log, category: pods
           id: restartedPodID,
           category: 'Pod',
           name: restartedPod,
@@ -199,7 +249,6 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
-
   //grab details of all current pods
   useEffect(() => {
     const pods = async () => {
@@ -210,7 +259,6 @@ const AlertsProvider = ({ children }) => {
           return
         }
         const data = await response.json();
-        // console.log('pod descriptions', data)
         const podData: PodDetails[] = data.data.result.map((pod) => {
           return {
           podName: pod.metric.pod,
@@ -226,7 +274,7 @@ const AlertsProvider = ({ children }) => {
     pods();
     const intervalID = setInterval(() => {
       pods()
-    }, 20000)
+    }, 5000)
 
     return () => clearInterval(intervalID);
   }, [])
@@ -245,22 +293,21 @@ const AlertsProvider = ({ children }) => {
     );
     const restartedPod = podDetails.filter(currentPod => 
       !prevPodDetails.some(prevPod => 
-        // prevPod[0] === currentPod[0] && prevPod[1] === currentPod[1]
         prevPod.podName === currentPod.podName && prevPod.podID === currentPod.podID
       )
     );
-    // console.log('failed', failedPod)
-    // console.log('restart', restartedPod)
-    // console.log(podDetails)
-    // console.log(prevPodDetails)
     if (failedPod.length > 0 && podDetails.length === prevPodDetails.length) {
       podFailedAlert(failedPod[0].podName, failedPod[0].podID);
       podRestartAlert(restartedPod[0].podName, restartedPod[0].podID)
-      alert(`Pod "${failedPod[0].podName}" has failed and has been restarted with "${restartedPod[0].podName}"`)
+      handlePodAlert(failedPod[0], restartedPod[0])
     }
     setPrevPodDetails(podDetails);
   }, [podDetails])
 
+  const handlePodAlert = (failedPod, startedPod) => {
+    setAlertMessage(`Pod "${failedPod.podName}" has failed and has been restarted with "${startedPod.podName}"`);
+    setShowAlert(true);
+  }
 
   // network traffic
   useEffect(() => {
@@ -327,12 +374,12 @@ const AlertsProvider = ({ children }) => {
   };
 
 
- // lowDiskSpaace
+ //query current disk space
 
   useEffect(() => {
     const lowDiskSpace = async () => {
       try {
-        const response = await fetch('http://localhost:9090/api/v1/query?query=100*(1-(node_filesystem_avail_bytes/node_filesystem_size_bytes))');
+        const response = await fetch('http://localhost:9090/api/v1/query?query=100 * (node_filesystem_size_bytes{fstype!~"tmpfs|overlay", mountpoint="/"} - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay", mountpoint="/"}) / node_filesystem_size_bytes{fstype!~"tmpfs|overlay", mountpoint="/"}');
         if (!response.ok){
           console.log('Failed Fetch');
           return
@@ -343,7 +390,6 @@ const AlertsProvider = ({ children }) => {
           nodeName: disk.metric.instance,
           diskNum: disk.value[1]
         }))
-        // console.log('HER EHERE HERE HERE' + diskData)
         setDiskSpace(diskData)
       } catch (err: unknown) {
         console.log(err);
@@ -359,9 +405,12 @@ const AlertsProvider = ({ children }) => {
     diskSpace.forEach(diskValue => {
       if (diskValue.diskNum > diskSpacePercentage) {
         sendDiskValueAlert(diskValue.diskNum, diskValue.nodeName)
+        handleDiskSpaceAlert(diskValue.diskNum, diskValue.nodeName)
       }
     })
   }, [diskSpace])
+
+  //sends disk space alert message to backend
 
   const sendDiskValueAlert = async (diskSpaceNum, nodeName) => {
     try {
@@ -388,48 +437,14 @@ const AlertsProvider = ({ children }) => {
     }
   }
 
+  //handler for disk space popup
 
-  // grab CPU usage per node
-
-  useEffect(() => {
-    const cpuUsage = async () => {
-      try {
-        const response = await fetch('http://localhost:9090/api/v1/query?query=100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[10m]) * 100) * on(instance) group_left(nodename) (node_uname_info))');
-        if (!response.ok){
-          console.log('Failed Fetch');
-          return
-        }
-        const data = await response.json();
-        // console.log('DATA', data);
-        const cpuUsagePerNode: CpuData[] = data.data.result.map((cpuUse) => ({
-          nodeName: cpuUse.metric.nodeName,
-          cpuUsage: cpuUse.value[1],
-        }))
-        setCpuData(cpuUsagePerNode);
-      } catch (err: unknown) {
-        console.log(err);
-      }
-    };
-    // if (!hasFetchedCpuData.current) {
-    //   cpuUsage();
-    //   hasFetchedCpuData.current = true;
-    // }
-    const intervalID = setInterval(() => {
-      cpuUsage()
-    }, 5000)
-    return () => clearInterval(intervalID);
-  }, []);
-
-  useEffect(() => {
-    const cpuThreshold = 60;
-    cpuData.forEach(cpuValue => {
-      if (cpuValue.cpuUsage > cpuThreshold) {
-        sendCpuAlert(cpuValue.cpuUsage, cpuValue.nodeName)
-      }
-    })
-  }, [cpuData])
+  const handleDiskSpaceAlert = (diskSpaceNum, nodeName) => {
+    setAlertMessage(`Disk space usage is high at ${diskSpaceNum}% on ${nodeName}.`);
+    setShowAlert(true);
+  }
  
-  // grab number of running pods
+  //fetch all current alerts to display
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -472,6 +487,17 @@ const AlertsProvider = ({ children }) => {
   return (
     <AlertsContext.Provider value={contextValue}>
       {children}
+      {showAlert && (
+        <Dialog open={true} onClose={() => setShowAlert(false)} size="xl">
+          <DialogTitle>Alert</DialogTitle>
+          <DialogDescription>{alertMessage}</DialogDescription>
+          <DialogActions>
+            <Button onClick={() => setShowAlert(false)} className='btn btn-primary'>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </AlertsContext.Provider>
   );
 
