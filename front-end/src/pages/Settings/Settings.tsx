@@ -150,7 +150,7 @@ export default function Settings() {
         {/* <Button type="reset" plain >
           Reset
         </Button> */}
-        <Button type="submit" color="superPurple">Save changes</Button>
+        <Button data-testid='submit' type="submit" color="superPurple">Save changes</Button>
       </div>
     </form>
   );

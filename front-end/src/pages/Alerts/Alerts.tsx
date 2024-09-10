@@ -201,7 +201,7 @@ function Alerts() {
         />
       </div>
       
-      <div className="flex items-end justify-between gap-4">
+      <div data-testid='alerts' className="flex items-end justify-between gap-4">
         <Heading>New Alerts</Heading>
       </div>
   
@@ -325,6 +325,7 @@ function Alerts() {
                 </TableCell>
                 <TableCell>
                   <Button 
+                    id="deleteButton"
                     className="text-red-500" 
                     color="red"
                     onClick={() => deleteAlert(alert.id, alert.log)}

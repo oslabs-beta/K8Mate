@@ -63,7 +63,7 @@ function Home() {
 
   return (
     
-    <div className="space-y-4">
+    <div data-testid='slogan' className="space-y-4">
       <Hero
         className="!pt-20 !pb-0"
         header={`Super Kuber™`} 
