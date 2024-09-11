@@ -616,16 +616,16 @@ const Tree = (): JSX.Element => {
         )}
 
         {showAlert[0] && (
-        <Dialog open={true} onClose={() => setShowAlert([false])} size="xl">
-          <DialogTitle>Additional Information</DialogTitle>
-          {showAlert[1]}
-          <DialogActions>
-            <Button onClick={() => setShowAlert([false])} className='btn btn-primary'>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+          <Dialog open={true} onClose={() => setShowAlert([false])} size="xl">
+            <DialogTitle>Additional Information</DialogTitle>
+            {showAlert[1]}
+            <DialogActions>
+              <Button onClick={() => setShowAlert([false])} className='btn btn-primary'>
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </div>
     </>
   )
