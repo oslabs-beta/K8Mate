@@ -9,7 +9,7 @@ const k8s = require('@kubernetes/client-node');
 // const { WebSocketServer } = require('ws');
 import { Request, Response, NextFunction } from 'express';
 import WebSocket, { WebSocketServer } from 'ws';
-// import { spawn } from 'node-pty';
+import { spawn } from 'node-pty';
 
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
@@ -30,31 +30,31 @@ app.use('/alert', alertRouter);
 app.use('/cluster', clusterRouter);
 app.use('/setting', settingRouter);
 
-//Terminal 
-// const wss = new WebSocketServer({ noServer: true });
+// Terminal 
+const wss = new WebSocketServer({ noServer: true });
 
-// wss.on('connection', (ws: WebSocket) => {
-//   console.log('connected to terminal');
-//   const shell = spawn('zsh', [], {
-//     name: 'xterm-color',
-//     cols: 80,
-//     rows: 24,
-//     cwd: process.env.HOME,
-//     env: process.env as NodeJS.ProcessEnv,
-//   });
+wss.on('connection', (ws: WebSocket) => {
+  console.log('connected to terminal');
+  const shell = spawn('zsh', [], {
+    name: 'xterm-color',
+    cols: 80,
+    rows: 24,
+    cwd: process.env.HOME,
+    env: process.env as NodeJS.ProcessEnv,
+  });
 
-//   shell.onData((data: string) => {
-//     ws.send(data);
-//   });
+  shell.onData((data: string) => {
+    ws.send(data);
+  });
 
-//   (ws as WebSocket).on('message', (msg: WebSocket) => {
-//     shell.write(msg.toString());
-//   });
+  (ws as WebSocket).on('message', (msg: WebSocket) => {
+    shell.write(msg.toString());
+  });
 
-//   (ws as WebSocket).on('close', () => {
-//     shell.kill();
-//   })
-// });
+  (ws as WebSocket).on('close', () => {
+    shell.kill();
+  })
+});
 
 //Error Handling
 app.use((req: Request, res: Response) =>
@@ -76,12 +76,11 @@ const server = app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
 
-// server.on('upgrade', (request: any, socket: any, head: any) => {
-//   wss.handleUpgrade(request, socket, head, (ws) => {
-//     wss.emit('connection', ws, request);
-//   });
-// });
-    // "node-pty": "^1.0.0",
+server.on('upgrade', (request: any, socket: any, head: any) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
+});
 
 
 export default app
