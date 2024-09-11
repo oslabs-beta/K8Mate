@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Notfound.module.css'; // Import the CSS module
 
+
+// Renders page for no route found
 const Notfound: React.FC = () => {
   return (
     <div className={styles.notFoundContainer}>
