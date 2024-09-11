@@ -17,6 +17,13 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+import { 
+  PlusIcon, 
+  ArrowDownTrayIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/16/solid'
+
+
 
 /* ------------------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------- CREATING INITIAL ELEMENTS  --------------------------------------- */
@@ -588,13 +595,20 @@ const Tree = (): JSX.Element => {
 
   return (
     <>
-      <Heading>K8s Structure</Heading>
-      <div style={{ height: '750px' }}>
-        <Button onClick={loadCluster}>Load Recent Cluster</Button> 
-        <Button onClick={handleRefresh}>Update Cluster</Button>
-        <Button onClick={handleSnapshot}>Take Snapshot</Button>
+      <div className ="flex flex-col mb-6 gap-2">
+        <Heading>K8s Structure</Heading>
+      {/* <div style={{ height: '750px' }}> */}
+        <div>
+          <Button className="m-1" color="superPurple" onClick={loadCluster}><ArrowDownTrayIcon/> Load Recent Cluster</Button> 
+          <Button className="m-1" color="light" onClick={handleRefresh}><ArrowPathIcon />Update Cluster</Button>
+          <Button className="m-1" color="light" onClick={handleSnapshot}><PlusIcon />Take Snapshot</Button>
+        </div>
+      </div>
 
-        {!firstLoad ? (  
+      <div className="flex flex-col w-full min-h-screen items-stretch overflow-visible">
+        {!firstLoad ? ( 
+          <div className="flex-grow w-full h-[750px] border rounded-md dark: border-gray-700">
+ 
           <ReactFlow
             nodes={updatedNodes}
             edges={updatedEdges}
@@ -607,16 +621,18 @@ const Tree = (): JSX.Element => {
             onNodeMouseEnter={onNodeEnter}
             onNodeMouseLeave={onNodeLeave}
             onNodeClick={onNodeClick}
+            style={{ width: '100%', height: '100%' }}
           >
             <Background />
             <Controls />
           </ReactFlow>
+          </div>
         ) : (
           <span></span>
         )}
 
         {k8sClusterHistory.length > 0 ? (
-          <div style={{ height: '250px', width: '100%', position: 'relative', marginTop: '20px' }}>
+          <div style={{ height: '100%', width: '100%', position: 'relative', marginTop: '20px' }}>
             <Chrono
               items={k8sClusterHistory.map((cluster, index) => ({
                 title: new Date(cluster.created_at).toLocaleString(),
@@ -624,7 +640,7 @@ const Tree = (): JSX.Element => {
               }))}
               mode="HORIZONTAL"
               allowDynamicUpdate={true}
-              enableDarkToggle={true}
+              // enableDarkToggle={true}
               activeItemIndex={null}
               cardLess={true}
               toolbarPosition='BOTTOM'
@@ -634,6 +650,23 @@ const Tree = (): JSX.Element => {
                   handleSetClusterFromHistory(selectedCluster.data.pods, selectedCluster.data.nodes, selectedCluster.data.services);
                 }
               }}
+              theme={{
+                primary: 'grey',
+                secondary: 'purple',
+                cardBgColor: 'yellow',
+                titleColor: 'gray',
+                titleColorActive: 'white',
+              }}
+              fontSizes={{
+                cardSubtitle: '0.85rem',
+                cardText: '0.8rem',
+                cardTitle: '0.9rem',
+                title: '0.9rem',
+              }}
+              itemWidth={125}
+              
+              focusActiveItemOnLoad={true}
+              onScrollEnd	
             />
           </div>
         ) : (
