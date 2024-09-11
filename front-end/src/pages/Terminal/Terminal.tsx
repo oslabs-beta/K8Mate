@@ -16,10 +16,14 @@ import '@xterm/xterm/css/xterm.css';
 
 
 
+
+
+
 const Terminal = (): JSX.Element => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const fitAddon = new FitAddon();
 
+  // List of commands you could use
   const commandsList = [
     {
       command: 'kubectl cluster-info',
@@ -106,20 +110,16 @@ const Terminal = (): JSX.Element => {
 
       
       <Heading data-testid='terminal' className={'terminal'} >Terminal</Heading>
-
       {/* <div ref={terminalRef} style={{ 
         height: 1000, 
         width: '100%', 
         }} /> */}
       <div className="w-full h-full my-8 rounded-lg border border-gray-300 lg:ring-1 lg:ring-zinc-950/5">
-
         <div 
           ref={terminalRef} 
           style={{ 
             height: '100%', 
             width: '100%', }}
-        
-
           />
       </div>
 
@@ -136,7 +136,6 @@ const Terminal = (): JSX.Element => {
             <TableHeader>Command</TableHeader>
             <TableHeader></TableHeader>
             <TableHeader>What it does</TableHeader>
-            
           </TableRow>
         </TableHead>
         <TableBody>
@@ -149,15 +148,11 @@ const Terminal = (): JSX.Element => {
                   <CopyIconButton textToCopy={item.command} />
                 </TableCell>
                 <TableCell className="whitespace-normal">{item.description}</TableCell>
-                
               </TableRow>
             ))}
-          
         </TableBody>
     </Table>
-    
     </>
-    
   )
 }
 

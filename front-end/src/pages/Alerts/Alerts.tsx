@@ -78,7 +78,6 @@ function Alerts() {
         });
         if (response.ok) {
           const alerts: AlertData[] = await response.json();
-          console.log("READ THIS THIS THIS ", alerts)
           updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
           setAlertList(alerts);
         }

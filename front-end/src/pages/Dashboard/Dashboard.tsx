@@ -27,7 +27,7 @@ function Dashboard(props) {
   useEffect(() => {
     const interval = setInterval(() => {
       setLoadedIframes((prev) => prev + 1);
-    }, 1000); // 1 second delay between iframe loading 
+    }, 50); // Slight loading time
 
     return () => clearInterval(interval); // Clear interval on component unmount
   }, [graphState]);
