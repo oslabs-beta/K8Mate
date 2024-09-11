@@ -5,9 +5,12 @@ import { Button } from '../../components/template/catalyst/button.tsx';
 import { Heading, Subheading } from '../../components/template/catalyst/heading.tsx';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.tsx';
 import { Select } from '../../components/template/catalyst/select.tsx';
+import { Checkbox } from '../../components/template/catalyst/checkbox.tsx'
+import { Text, TextLink } from '../../components/template/catalyst/text.tsx'
+
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 import { convertToMilitaryTime } from '../../hooks/useData.ts';
-
 import { AlertsContext } from './AlertsContext.tsx';
 import { SettingsContext } from '../../contexts/SettingsContext.tsx';
 
@@ -128,9 +131,11 @@ function Alerts() {
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, alertName: string, id: string) => {
-    const newStatus = event.target.value as "read" | "unread";
-    updateAlerts(alertName, id, newStatus);
+  const handleBoxChange = (checked: boolean, alertName: string, id: string) => {
+    setTimeout(() => {
+      const newStatus = checked ? "read" : "unread";
+      updateAlerts(alertName, id, newStatus);
+    }, 300)
   };
 
   const deleteAlert = async (id: string, log: string) => {
@@ -191,13 +196,14 @@ function Alerts() {
 
   return (
     <>
-      <div className="my-4">
+      <div className="flex gap-2 mt-4 mb-12">
+        <MagnifyingGlassIcon className='w-4'/>
         <input 
           type="text" 
           placeholder="Search messages..." 
           value={search} 
           onChange={(e) => setSearch(e.target.value)} 
-          className="p-2 border border-gray-300 rounded"
+          className="p-1 border border-gray-300 rounded text-sm w-72"
         />
       </div>
       
@@ -205,14 +211,14 @@ function Alerts() {
         <Heading>New Alerts</Heading>
       </div>
   
-      <Table className="mt-8 mb-12 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
+      <Table className="mt-2 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
             <TableHeader>Component Name</TableHeader>
             <TableHeader>Message</TableHeader>
             <TableHeader>Category</TableHeader>
             <TableHeader>Time Stamp</TableHeader>
-            <TableHeader>Status</TableHeader>
+            <TableHeader>Read?</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -234,15 +240,12 @@ function Alerts() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Select
+                  <Checkbox
                     name="status"
-                    value={alert.read}
-                    onChange={(event) => {
-                      handleChange(event, alert.node_name, alert.id);
-                    }}>
-                    <option value="unread">unread</option>
-                    <option value="read">read</option>
-                  </Select>
+                    checked={alert.read === "read"}
+                    onChange={(checked: boolean) => handleBoxChange(checked, alert.node_name, alert.id)}        
+                    className="transition-colors duration-300 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"                              
+                    />
                 </TableCell>
               </TableRow>
             ))
@@ -256,7 +259,7 @@ function Alerts() {
         </TableBody>
       </Table>
   
-      <div className="flex justify-between items-center my-4">
+      <div className="flex justify-between items-center mt-6">
         <Button 
           onClick={handlePreviousNewAlertsPage} 
           disabled={newAlertsPage === 1} 
@@ -277,21 +280,21 @@ function Alerts() {
       </div>
   
       {/* Divider Line */}
-      <hr className="my-8 border-t-.1 border-gray-300" />
+      <hr className="my-14 border-t-[2px] border-gray-400" />
   
       <div className="flex items-end justify-between gap-4">
         <Heading>Resolved Alerts</Heading>
       </div>
   
-      <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
+      <Table className="mt-2 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
             <TableHeader>Component Name</TableHeader>
             <TableHeader>Message</TableHeader>
             <TableHeader>Category</TableHeader>
             <TableHeader>Time Stamp</TableHeader>
-            <TableHeader>Status</TableHeader>
-            <TableHeader></TableHeader>
+            <TableHeader>Read?</TableHeader>
+            {/* <TableHeader></TableHeader> */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -313,25 +316,22 @@ function Alerts() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Select
+                  <Checkbox
                     name="status"
-                    value={alert.read}
-                    onChange={(event) => {
-                      handleChange(event, alert.node_name, alert.id);
-                    }}>
-                    <option value="unread">unread</option>
-                    <option value="read">read</option>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Button 
-                    id="deleteButton"
-                    className="text-red-500" 
-                    color="red"
+                    checked={alert.read === "read"}
+                    onChange={(checked: boolean) => handleBoxChange(checked, alert.node_name, alert.id)}  
+                    className="transition-colors duration-300 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"                  
+                    />
+                  <Text id="deleteButton"   
+                    style={{ 
+                      color: 'red', 
+                      cursor: 'pointer', 
+                      textDecoration: 'underline',
+                      fontSize: '12px' 
+                    }} 
                     onClick={() => deleteAlert(alert.id, alert.log)}
-                  >
-                    delete
-                  </Button>
+                  > delete
+                  </Text> 
                 </TableCell>
               </TableRow>
             ))
@@ -346,7 +346,7 @@ function Alerts() {
         </TableBody>
       </Table>
   
-      <div className="flex justify-between items-center my-4">
+      <div className="flex justify-between items-center mt-6 mb-6">
         <Button 
           onClick={handlePreviousResolvedAlertsPage} 
           disabled={resolvedAlertsPage === 1} 
