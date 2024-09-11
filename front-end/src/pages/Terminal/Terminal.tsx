@@ -124,10 +124,9 @@ const Terminal = (): JSX.Element => {
       </div>
 
       <div  data-testid='commandLine' className="mb-4">
-        <Heading >Command Line Cheat Sheet</Heading>
+        <Heading >Manage Your Cluster</Heading>
         <Text>
-          This cheat sheet is a quick reference guide for essential kubectl commands to interact with Kubernetes clusters. 
-          It covers common tasks such as managing pods, deployments, services, and configurations, helping you work efficiently within your cluster.
+          This cheat sheet provides key kubectl commands for managing Kubernetes clusters, including tasks like handling pods, deployments, and services for efficient cluster management.
         </Text>
       </div>
 
