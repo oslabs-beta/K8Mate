@@ -30,7 +30,7 @@ app.use('/alert', alertRouter);
 app.use('/cluster', clusterRouter);
 app.use('/setting', settingRouter);
 
-//Terminal 
+// Terminal 
 const wss = new WebSocketServer({ noServer: true });
 
 wss.on('connection', (ws: WebSocket) => {
