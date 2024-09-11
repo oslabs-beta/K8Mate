@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from "../../components/template/catalyst/button.tsx";
 import { Heading } from '../../components/template/catalyst/heading.tsx';
+import { Dialog, DialogTitle, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog';
 import { Chrono } from 'react-chrono';
+import { ClusterElement } from '../../../fronttypes.ts';
 import { 
   ReactFlow, 
   Controls, 
@@ -13,12 +15,8 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-type ClusterElement = {
-  name: string,
-  created_at: string;
-  category: 'pod' | 'service' | 'node',
-  data: any
-};
+
+/* ----------------------------- Create Initial Elements ----------------------------- */
 
 const initialNodes: Node[] = [
   {
@@ -85,6 +83,8 @@ const initialEdges: Edge[] = [
 
 const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
 
+/* ----------------------------- Create Tree Structure ----------------------------- */
+
 const Tree = (): JSX.Element => {
   const [ k8sCluster, setK8sCluster ] = useState<ClusterElement[]>([]);
   const [ k8sPodsList, setK8sPods ] = useState<ClusterElement[]>([]);
@@ -96,8 +96,9 @@ const Tree = (): JSX.Element => {
   const [ visibleEdges, setVisibleEdges ] = useState<Set<string>>(new Set()); 
   const [firstLoad, setFirstLoad] = useState<boolean>(true); 
   const [selectedNodeId, setSelectedNodeId] = useState<string[]>([]);
+  const [showAlert, setShowAlert] = useState<(boolean | React.JSX.Element[])[]>([false])
 
-  // Grab the current cluster state when the button is pressed
+  // Grab the current cluster state when the 'load recent cluster' button is pressed
   const loadCluster = async () => {
     try {
       const response = await fetch('http://localhost:8080/cluster/all', {
@@ -105,12 +106,12 @@ const Tree = (): JSX.Element => {
           'Content-Type': 'application/json'
         }
       });
+
       if (response.ok) {
         const cluster: ClusterElement[] = await response.json();
-        console.log('CLUSTER INFO', cluster);
         setNodes(initialNodes);
         setK8sCluster(cluster);
-        setFirstLoad(false); 
+        setFirstLoad(false);
       }
     } catch (err) {
       console.log(err);
@@ -150,7 +151,7 @@ const Tree = (): JSX.Element => {
   
       const nodesForFlow: Node[] = nodeNodes.map((node, index) => ({
         id: node.name,
-        data: { label: `Worker Node: ${node.name}`, data: node.data },
+        data: { label: `Worker Node: ${node.name}`, data: node },
         position: { x: (index * 350) + 50, y: 400},
         style: { 
           border: '2px solid #2563eb', 
@@ -183,7 +184,7 @@ const Tree = (): JSX.Element => {
     
           podsForFlow.push({
             id: pod.name,
-            data: { label: `Pod: ${pod.name}`, data: pod.data},
+            data: { label: `Pod: ${pod.name}`, data: pod },
             position: { x: xPosition, y: yPosition },
             style: { 
               border: '1px solid black', 
@@ -240,7 +241,7 @@ const Tree = (): JSX.Element => {
         .filter((service) => connectedServices.has(service.name))
         .map((service, index) => ({
           id: service.name,
-          data: { label: `Service: ${service.name}`, data: service.data},
+          data: { label: `Service: ${service.name}`, data: service },
           position: { x: 1200, y: 400 + index * 75 },
           style: { 
             border: '1px solid black', 
@@ -329,43 +330,57 @@ const Tree = (): JSX.Element => {
     });
   }, [edges]);
 
+  const populateInformation = (type: string, information: string[], node): void => {
+    information.push(`${type} name: ${node.data.data.name}`);        
+    information.push(`Time created: ${new Date(node.data.data.created_at).toLocaleString()}`);
+    information.push(`UID: ${node.data.data.uid}`);
+  }
+
+  const dialogDescriptor = (information: string[]): React.JSX.Element[] => {
+    const dialogs: React.JSX.Element[] = [];
+
+    information.forEach(ele => {
+      dialogs.push(<DialogDescription>{ele}</DialogDescription>);
+    })
+    return dialogs;
+  }
+
   const onNodeClick = (event, node) => {
     const category = node.data.label.split(':')[0];
     const information: string[] = [];
     switch (category) {
       case 'Pod':
-        console.log('is a pod');
-        for(const key in node.data.data) {
-          if (key != 'containers' && key != 'labels')
-            information.push(`${key}: ${node.data.data[key]}`);
-          else if (key === 'containers') {
-            let str: string = 'Containers:';
-            node.data.data[key].forEach(ele => {
-              str+= ` ${ele},`
-            })
+        populateInformation('Pod', information, node);
+        
+        let str: string = 'Containers:';
+        node.data.data.data.containers.forEach(ele => {str+= ` ${ele},`})
 
-            information.push(str.slice(0, -1));
-          }
-        };
+        information.push(str.slice(0, -1));
         break;
-      case 'Worker Node':
-        console.log('is a node');
-        for(const key in node.data.data) {
-            information.push(`${key}: ${node.data.key}`);
-        };
+      case 'Worker Node':      
+        populateInformation('Worker node', information, node);
+
+        information.push(`Cluster name: ${node.data.data.data.clusterName}`);
+        information.push(`Instance type: ${node.data.data.data.instanceType}`);
+        information.push(`Nodegroup name: ${node.data.data.data.nodegroupName}`);
+        information.push(`Region: ${node.data.data.data.region}`);
         break;
       case 'Service':
-        console.log('is a service');
-        for(const key in node.data.data) {
-          information.push(`${key}: ${node.data.key}`);
-        }
+        populateInformation('Service', information, node);
+
+        information.push(`Namespace: ${node.data.data.data.namespace}`);
+        break;
+      case 'Container':
+        const labels = node.data.label.split(': ');
+
+        information.push(`Container name: ${labels[1]}`);
         break;
       default:
-        console.log('is a', category);
+        information.push(`Label: ${node.data.label}`)
     }
     
-    console.log(category, node);
-    console.log('information:', information);
+    const dialog = dialogDescriptor(information);
+    setShowAlert([true, dialog]);
   };
 
   const updatedEdges: Edge[] = edges.map((edge) => ({
@@ -395,7 +410,7 @@ const Tree = (): JSX.Element => {
   
     const newNodes: Node[] = nodes.map((node, index) => ({
       id: node.name,
-      data: { label: `Worker Node: ${node.name}`, data: node.data},
+      data: { label: `Worker Node: ${node.name}`, data: node},
       position: { x: index * 350 + 50, y: 400},
       style: { 
         border: '2px solid #2563eb', 
@@ -430,7 +445,7 @@ const Tree = (): JSX.Element => {
   
         newPods.push({
           id: pod.name,
-          data: { label: `Pod: ${pod.name}`, data: pod.data},
+          data: { label: `Pod: ${pod.name}`, data: pod },
           position: { x: xPosition, y: yPosition },
           style: { 
             border: '1px solid black', 
@@ -444,7 +459,7 @@ const Tree = (): JSX.Element => {
     });
     const newServices: Node[] = services.map((service, index) => ({
       id: service.name,
-      data: { label: `Service: ${service.name}`, data: service.data },
+      data: { label: `Service: ${service.name}`, data: service },
       position: { x: 1200, y: 400 + index * 75 },
       style: { 
         border: '1px solid black', 
@@ -531,20 +546,12 @@ const Tree = (): JSX.Element => {
   }
 
   const handleSnapshot = async () => {
-    // const pods: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'pod');
-    // const services: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'service');
-    // const nodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'node');
     try {
       const response = await fetch('http://localhost:8080/cluster/postAll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         }
-        // body: JSON.stringify({
-        //   pods: pods,
-        //   nodes: nodes,
-        //   services: services,
-        // })
       });
       if (response.ok) {
         console.log('Snapshot taken');
@@ -561,6 +568,7 @@ const Tree = (): JSX.Element => {
         <Button onClick={loadCluster}>Load Recent Cluster</Button> 
         <Button onClick={handleRefresh}>Update Cluster</Button>
         <Button onClick={handleSnapshot}>Take Snapshot</Button>
+
         {!firstLoad ? (  
           <ReactFlow
             nodes={updatedNodes}
@@ -581,6 +589,7 @@ const Tree = (): JSX.Element => {
         ) : (
           <span></span>
         )}
+
         {k8sClusterHistory.length > 0 ? (
           <div style={{ height: '250px', width: '100%', position: 'relative', marginTop: '20px' }}>
             <Chrono
@@ -605,6 +614,18 @@ const Tree = (): JSX.Element => {
         ) : (
           <p>Grabbing history...</p> 
         )}
+
+        {showAlert[0] && (
+        <Dialog open={true} onClose={() => setShowAlert([false])} size="xl">
+          <DialogTitle>Additional Information</DialogTitle>
+          {showAlert[1]}
+          <DialogActions>
+            <Button onClick={() => setShowAlert([false])} className='btn btn-primary'>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
       </div>
     </>
   )
