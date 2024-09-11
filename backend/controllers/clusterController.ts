@@ -59,7 +59,7 @@ clusterController.postSnapshot = (req: Request, res: Response, next: NextFunctio
 
 //gets all posted clusters from the history table
 clusterController.getHistory = (req: Request, res: Response, next: NextFunction) => {
-  alertQuery(`SELECT * FROM clusters`)
+  alertQuery(`SELECT * FROM clusters ORDER BY id ASC`)
     .then((data) => {
       res.locals.history = data.rows;
       return next();
