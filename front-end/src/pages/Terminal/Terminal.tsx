@@ -7,10 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Text, Code } from "../../components/template/catalyst/text.tsx";
 import { Divider } from "../../components/template/catalyst/divider.tsx";
 
-
-import {
-  DocumentDuplicateIcon
-} from '@heroicons/react/24/outline'
+import CopyIconButton from '../../components/custom/CopyIconButton/CopyIconButton.tsx';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 
 
 // import 'xterm/css/xterm.css'
@@ -133,7 +131,7 @@ const Terminal = (): JSX.Element => {
         </Text>
       </div>
 
-      <Table>
+      <Table dense>
         <TableHead>
           <TableRow>
             <TableHeader>Command</TableHeader>
@@ -148,7 +146,9 @@ const Terminal = (): JSX.Element => {
                 <TableCell className="whitespace-normal">
                   <Code>{item.command}</Code>
                   </TableCell>
-                <TableCell className="text-zinc-500"><DocumentDuplicateIcon className= "w-4 h-4"/></TableCell>
+                <TableCell className="text-zinc-500">
+                  <CopyIconButton textToCopy={item.command} />
+                </TableCell>
                 <TableCell className="whitespace-normal">{item.description}</TableCell>
                 
               </TableRow>
