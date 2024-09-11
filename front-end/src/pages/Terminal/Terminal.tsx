@@ -6,15 +6,15 @@ import { Heading, Subheading } from '../../components/template/catalyst/heading.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.tsx';
 import { Text, Code } from "../../components/template/catalyst/text.tsx";
 import { Divider } from "../../components/template/catalyst/divider.tsx";
-
-
 import {
   DocumentDuplicateIcon
 } from '@heroicons/react/24/outline'
 
-
 // import 'xterm/css/xterm.css'
 import '@xterm/xterm/css/xterm.css';
+
+
+
 
 
 
@@ -22,6 +22,7 @@ const Terminal = (): JSX.Element => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const fitAddon = new FitAddon();
 
+  // List of commands you could use
   const commandsList = [
     {
       command: 'kubectl cluster-info',
@@ -108,20 +109,16 @@ const Terminal = (): JSX.Element => {
 
       
       <Heading data-testid='terminal' className={'terminal'} >Terminal</Heading>
-
       {/* <div ref={terminalRef} style={{ 
         height: 1000, 
         width: '100%', 
         }} /> */}
       <div className="w-full h-full my-8 rounded-lg border border-gray-300 lg:ring-1 lg:ring-zinc-950/5">
-
         <div 
           ref={terminalRef} 
           style={{ 
             height: '100%', 
             width: '100%', }}
-        
-
           />
       </div>
 
@@ -139,7 +136,6 @@ const Terminal = (): JSX.Element => {
             <TableHeader>Command</TableHeader>
             <TableHeader></TableHeader>
             <TableHeader>What it does</TableHeader>
-            
           </TableRow>
         </TableHead>
         <TableBody>
@@ -150,15 +146,11 @@ const Terminal = (): JSX.Element => {
                   </TableCell>
                 <TableCell className="text-zinc-500"><DocumentDuplicateIcon className= "w-4 h-4"/></TableCell>
                 <TableCell className="whitespace-normal">{item.description}</TableCell>
-                
               </TableRow>
             ))}
-          
         </TableBody>
     </Table>
-    
     </>
-    
   )
 }
 
