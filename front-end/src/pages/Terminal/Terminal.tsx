@@ -28,28 +28,40 @@ const Terminal = (): JSX.Element => {
       description: 'Shows addresses of the control plane and services like API server and DNS'
     },
     {
-      command: 'kubectl cluster-info',
-      description: 'Shows addresses of the control plane and services like API server and DNS'
+      command: 'kubectl get nodes',
+      description: 'Shows a list of nodes'
     },
     {
-      command: 'kubectl cluster-info',
-      description: 'More detailed overview of specific deployments'
+      command: 'kubectl describe node <node-name>',
+      description: 'More detailed overview of a specific node'
+    },
+    {
+      command: 'kubectl get pods',
+      description: 'Shows a list of running pods'
+    },
+    {
+      command: 'kubectl describe pod <pod-name>',
+      description: 'More detailed overview of a specific pod'
+    },
+    {
+      command: 'kubectl get deployments',
+      description: 'Shows a list of deployments'
     },
     {
       command: 'kubectl describe deployment <deployment-name>',
-      description: 'Shows addresses of the control plane and services like API server and DNS'
+      description: 'More detailed overview of specific deployments'
     },
     {
-      command: 'kubectl cluster-info',
-      description: 'Shows addresses of the control plane and services like API server and DNS'
+      command: 'kubectl get services',
+      description: 'Shows a list of services'
     },
     {
-      command: 'kubectl cluster-info',
-      description: 'Shows addresses of the control plane and services like API server and DNS'
+      command: 'kubectl describe service <service-name>',
+      description: 'More detailed overview of specific services'
     },
     {
-      command: 'kubectl cluster-info',
-      description: 'Shows addresses of the control plane and services like API server and DNS'
+      command: 'kubectl get all',
+      description: 'Lists all resources (pods, services, deployments, etc.)'
     },
     {
       command: 'kubectl port-forward [TYPE/NAME] [LOCAL_PORT]:[REMOTE_PORT]',
@@ -115,7 +127,10 @@ const Terminal = (): JSX.Element => {
 
       <div  data-testid='commandLine' className="mb-4">
         <Heading >Command Line Cheat Sheet</Heading>
-        <Text >Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+        <Text>
+          This cheat sheet is a quick reference guide for essential kubectl commands to interact with Kubernetes clusters. 
+          It covers common tasks such as managing pods, deployments, services, and configurations, helping you work efficiently within your cluster.
+        </Text>
       </div>
 
       <Table>
