@@ -6,9 +6,10 @@ import { Heading, Subheading } from '../../components/template/catalyst/heading.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/template/catalyst/table.tsx';
 import { Text, Code } from "../../components/template/catalyst/text.tsx";
 import { Divider } from "../../components/template/catalyst/divider.tsx";
-import {
-  DocumentDuplicateIcon
-} from '@heroicons/react/24/outline'
+
+import CopyIconButton from '../../components/custom/CopyIconButton/CopyIconButton.tsx';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+
 
 // import 'xterm/css/xterm.css'
 import '@xterm/xterm/css/xterm.css';
@@ -123,14 +124,13 @@ const Terminal = (): JSX.Element => {
       </div>
 
       <div  data-testid='commandLine' className="mb-4">
-        <Heading >Command Line Cheat Sheet</Heading>
+        <Heading >Manage Your Cluster</Heading>
         <Text>
-          This cheat sheet is a quick reference guide for essential kubectl commands to interact with Kubernetes clusters. 
-          It covers common tasks such as managing pods, deployments, services, and configurations, helping you work efficiently within your cluster.
+          This cheat sheet provides key kubectl commands for managing Kubernetes clusters, including tasks like handling pods, deployments, and services for efficient cluster management.
         </Text>
       </div>
 
-      <Table>
+      <Table dense>
         <TableHead>
           <TableRow>
             <TableHeader>Command</TableHeader>
@@ -144,7 +144,9 @@ const Terminal = (): JSX.Element => {
                 <TableCell className="whitespace-normal">
                   <Code>{item.command}</Code>
                   </TableCell>
-                <TableCell className="text-zinc-500"><DocumentDuplicateIcon className= "w-4 h-4"/></TableCell>
+                <TableCell className="text-zinc-500">
+                  <CopyIconButton textToCopy={item.command} />
+                </TableCell>
                 <TableCell className="whitespace-normal">{item.description}</TableCell>
               </TableRow>
             ))}

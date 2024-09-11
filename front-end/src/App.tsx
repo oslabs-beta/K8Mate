@@ -9,7 +9,6 @@ import Alerts from './pages/Alerts/Alerts.tsx';
 import Dashboard from './pages/Dashboard/Dashboard.tsx';
 import Tree from './pages/Tree/Tree.tsx';
 import Notfound from './pages/Notfound/Notfound.tsx';
-import Flow from './pages/Flow/Flow';
 import Settings from './pages/Settings/Settings.tsx';
 import Terminal from './pages/Terminal/Terminal.tsx';
 
@@ -39,9 +38,6 @@ function App(props) {
         <Route path="/tree" element={withLayout(Tree)} />
         <Route path="/settings" element={withLayout(Settings)} />
         <Route path="/terminal" element={withLayout(Terminal)} />
-
-        {/* TO BE REMOVED */}
-        <Route path="/flow" element={withLayout(Flow)} />
 
         {/* Catch-all route without the layout */}
         <Route path="*" element={<Notfound />} />

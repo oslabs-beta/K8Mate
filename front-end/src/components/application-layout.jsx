@@ -72,8 +72,8 @@ export function ApplicationLayout({ children, showSidebar, setShowSidebar }) {
         <Sidebar>
           <SidebarHeader>
             <SidebarItem style={{ pointerEvents: 'none', cursor: 'default' }}>
-            <Logo className ="h-6 w-6 "/>
-              <SidebarLabel>Super Kuber™</SidebarLabel>
+            <Logo className ="w-6 "/>
+              <SidebarLabel>K8 Mate™</SidebarLabel>
             </SidebarItem>
           </SidebarHeader>
           <SidebarBody>
