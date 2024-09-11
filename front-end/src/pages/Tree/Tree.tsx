@@ -3,6 +3,8 @@ import { Button } from "../../components/template/catalyst/button.tsx";
 import { Heading } from '../../components/template/catalyst/heading.tsx';
 import { Dialog, DialogTitle, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog';
 import { Chrono } from 'react-chrono';
+
+import { getSingleCluster, refreshSingleCluster, postSnapshot, getHistory } from '../../services/treeService.js'
 import { ClusterElement } from '../../../fronttypes.ts';
 import { 
   ReactFlow, 
@@ -16,7 +18,9 @@ import {
 import '@xyflow/react/dist/style.css';
 
 
-/* ----------------------------- Create Initial Elements ----------------------------- */
+/* ------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- CREATING INITIAL ELEMENTS  --------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------- */
 
 const initialNodes: Node[] = [
   {
@@ -83,7 +87,9 @@ const initialEdges: Edge[] = [
 
 const defaultViewport = { x: 0, y: 0, zoom: 0.8 };
 
-/* ----------------------------- Create Tree Structure ----------------------------- */
+/* ------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- CREATING THE TREE STRUCTURE  --------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------- */
 
 const Tree = (): JSX.Element => {
   const [ k8sCluster, setK8sCluster ] = useState<ClusterElement[]>([]);
@@ -98,57 +104,60 @@ const Tree = (): JSX.Element => {
   const [selectedNodeId, setSelectedNodeId] = useState<string[]>([]);
   const [showAlert, setShowAlert] = useState<(boolean | React.JSX.Element[])[]>([false])
 
-  // Grab the current cluster state when the 'load recent cluster' button is pressed
+  /*--------------------------------------------- FETCH REQUESTS ---------------------------------------------- */
+
   const loadCluster = async () => {
     try {
-      const response = await fetch('http://localhost:8080/cluster/all', {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await getSingleCluster();
 
-      if (response.ok) {
-        const cluster: ClusterElement[] = await response.json();
-        setNodes(initialNodes);
-        setK8sCluster(cluster);
-        setFirstLoad(false);
-      }
-    } catch (err) {
-      console.log(err);
-    }
+      const cluster: ClusterElement[] = response;
+      setNodes(initialNodes);
+      setK8sCluster(cluster);
+      setFirstLoad(false);
+    } catch (err) { console.log(err); }
   };
 
-  // Grab the cluster history
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/cluster/history', {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        if (response.ok) {
-          const clusterHistory: ClusterElement[] = await response.json();
-          setK8sClusterHistory(clusterHistory);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchHistory();
-  }, [k8sCluster]);
+  const handleRefresh = async () => {
+    try {
+      const response = await refreshSingleCluster();
+      
+      const refreshedCluster: ClusterElement[] = response;
+      setK8sCluster(refreshedCluster);
+    } catch (err) { console.log(err); }
+  }
 
-  // Set nodes based on the loaded cluster (only triggered if cluster is loaded)
+  const handleSnapshot = async () => {
+    try { await postSnapshot(); } 
+    catch (err) { console.log(err); }
+  }
+
+  const fetchHistory = async () => {
+    try {
+      const response = await getHistory();
+      
+      const clusterHistory: ClusterElement[] = response;
+      setK8sClusterHistory(clusterHistory);
+    } catch (err) { console.log(err); }
+  }
+
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ----------------------------------------- CREATING THE NODE OBJECTS ----------------------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
+
+  // Set nodes based on the loaded cluster (only triggered if cluster is loaded and 'load recent cluster' has been pressed)
   useEffect(() => {
     if (!firstLoad) {  
+      //populate arrays with corresponding information
       const podsNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'pod');
       const servicesNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'service');
       const nodeNodes: ClusterElement[] = k8sCluster.filter((ele) => ele.category === 'node');
   
+      //populate the k8s states with their corresponding array of data
       setK8sPods(podsNodes);
       setK8sServices(servicesNodes);
       setK8sNodes(nodeNodes);
   
+      //create node array of WORKER NODES
       const nodesForFlow: Node[] = nodeNodes.map((node, index) => ({
         id: node.name,
         data: { label: `Worker Node: ${node.name}`, data: node },
@@ -168,6 +177,7 @@ const Tree = (): JSX.Element => {
 
       const groupedPodsCache: Record<string, ClusterElement[]> = {};
 
+      //connect the PODS to their correct WORKER NODE
       nodeNodes.forEach((workerNode) => {
         const workerNodeName = workerNode.name;
         if (!groupedPodsCache[workerNodeName]) {
@@ -176,6 +186,7 @@ const Tree = (): JSX.Element => {
         groupedPodsCache[workerNodeName] = podsNodes.filter((pod) => pod.data.nodeName === workerNodeName)
       })
   
+      //create node array of PODS
       const podsForFlow: Node[] = [];
       Object.keys(groupedPodsCache).forEach((nodeName, nodeIndex) => {
         groupedPodsCache[nodeName].forEach((pod, podIndex) => {
@@ -201,15 +212,21 @@ const Tree = (): JSX.Element => {
     }
   }, [k8sCluster, firstLoad]); 
 
-  // Set edges logic remains the same
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ----------------------------- CREATING THE EDGES, SERVICES, AND CONTAINER NODES ----------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
+
+  // set and connect the edges upon first load, current cluster, or a new cluster history change
   useEffect(() => {
     if (!firstLoad) { 
+      //creating edges array connecting MASTER NODE to WORKER NODES
       const masterNodeToWorkerNodes: Edge[] = k8sNodesList.map((node, index) => ({
         id: `el2-${index}`,
         source: 'api-server',
         target: node.name,
       }));
 
+      //creating edges array connecting WORKER NODES to PODS
       const workerNodeToPods: Edge[] = k8sPodsList.map((pod, index) => ({
         id: `el3-${index}`,
         source: pod.data.nodeName,
@@ -218,6 +235,7 @@ const Tree = (): JSX.Element => {
 
       const connectedServices = new Set<string>();
 
+      //creating edges array connecting SERVICES to PODS
       const serviceToPods: Edge[] = k8sServicesList.flatMap((service, serviceIndex) => {
         if (!service.data.selector) return [];
         const matchingPods = k8sPodsList.filter((pod) => {
@@ -229,7 +247,8 @@ const Tree = (): JSX.Element => {
         if (matchingPods.length > 0) {
           connectedServices.add(service.name);
         }
-
+        
+        //return array containing service-pod paris
         return matchingPods.map((pod, podIndex) => ({
           id: `s-p-${serviceIndex}-${podIndex}`,
           source: service.name,
@@ -237,6 +256,7 @@ const Tree = (): JSX.Element => {
         }));
       });
 
+      //create node array of SERVICES
       const serviceNodes: Node[] = k8sServicesList
         .filter((service) => connectedServices.has(service.name))
         .map((service, index) => ({
@@ -248,19 +268,23 @@ const Tree = (): JSX.Element => {
             padding: 10, 
             fontSize: 7,
             backgroundColor: 'orange',
-            boxShadow: '0px 0px',
-           },
-        }))
+          },
+        }
+      ));
 
+      //create node array of CONTAINERS and corresponding edges
       const containerEdges: Edge[] = [];
       const containerNodes: Node[] = k8sPodsList.flatMap((pod, podIndex) => {
         return pod.data.containers.map((container, containerIndex) => {
           const edgeId = `p-c-${pod.name}-${container}`;
+          //populate container edges array
           containerEdges.push({
             id: edgeId,
             source: pod.name,
             target: container,
           });
+          
+          //creating the container node
           return {
             id: container,
             data: { label: `Container: ${container}` },
@@ -270,12 +294,12 @@ const Tree = (): JSX.Element => {
               padding: 10, 
               fontSize: 7,
               backgroundColor: 'white',
-              boxShadow: '0px 0px',
             },
           };
         });
       });
 
+      //updating edges state with the created node-to-node pairs
       setEdges(prev => {
         const newWorkerEdges: Edge[] = masterNodeToWorkerNodes.filter(
           (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
@@ -286,24 +310,33 @@ const Tree = (): JSX.Element => {
         const newServiceEdges: Edge[] = serviceToPods.filter(
           (newEdge) => !prev.some((edge) => edge.id === newEdge.id)
         )
-        // return [...prev, ...newWorkerEdges, ...newPodEdges, ...newServiceEdges, ...containerEdges]
+
         return [...newWorkerEdges, ...newPodEdges, ...newServiceEdges, ...containerEdges]
       })
 
+      //updating nodes state with the created nodes
       setNodes(prev => [ ...prev, ...serviceNodes, ...containerNodes ])
      
     }
   }, [k8sCluster, firstLoad, k8sClusterHistory]);
 
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ----------------------------------------- ON EVENT TRIGGER FUNCTIONS ---------------------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
+
+  //update nodes array state upon changes
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     [],
   );
+
+  //update edges array state upon changes
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     [],
   );
 
+  //CURSOR HOVERS OVER NODE: make corresponding edges visible and node glow
   const onNodeEnter = useCallback((event, node) => {
     setVisibleEdges((prevVisibleEdges) => {
       const newVisibleEdges = new Set(prevVisibleEdges);
@@ -317,6 +350,7 @@ const Tree = (): JSX.Element => {
     });
   }, [edges]);
 
+  //CURSOR STOPS HOVERING OVER NODE: make corresponding edges invisible and undo glow
   const onNodeLeave = useCallback((event, node) => {
     setVisibleEdges((prevVisibleEdges) => {
       const newVisibleEdges = new Set(prevVisibleEdges);
@@ -330,51 +364,53 @@ const Tree = (): JSX.Element => {
     });
   }, [edges]);
 
+  //helper function for information array
   const populateInformation = (type: string, information: string[], node): void => {
     information.push(`${type} name: ${node.data.data.name}`);        
     information.push(`Time created: ${new Date(node.data.data.created_at).toLocaleString()}`);
     information.push(`UID: ${node.data.data.uid}`);
   }
 
+  //create dialog description elements using information array
   const dialogDescriptor = (information: string[]): React.JSX.Element[] => {
     const dialogs: React.JSX.Element[] = [];
-
-    information.forEach(ele => {
-      dialogs.push(<DialogDescription>{ele}</DialogDescription>);
-    })
+    information.forEach(ele => { dialogs.push(<DialogDescription>{ele}</DialogDescription>); })
     return dialogs;
   }
 
+  //MOUSE CLICKS ON NODE: send over array of populated dialog descriptions based on the node clicked
   const onNodeClick = (event, node) => {
     const category = node.data.label.split(':')[0];
     const information: string[] = [];
+    
+    //get information depending on node category
     switch (category) {
       case 'Pod':
-        populateInformation('Pod', information, node);
-        
         let str: string = 'Containers:';
-        node.data.data.data.containers.forEach(ele => {str+= ` ${ele},`})
+        node.data.data.data.containers.forEach(ele => {str+= ` ${ele},`});
 
+        populateInformation('Pod', information, node);
         information.push(str.slice(0, -1));
         break;
+
       case 'Worker Node':      
         populateInformation('Worker node', information, node);
-
         information.push(`Cluster name: ${node.data.data.data.clusterName}`);
         information.push(`Instance type: ${node.data.data.data.instanceType}`);
         information.push(`Nodegroup name: ${node.data.data.data.nodegroupName}`);
         information.push(`Region: ${node.data.data.data.region}`);
         break;
+
       case 'Service':
         populateInformation('Service', information, node);
-
         information.push(`Namespace: ${node.data.data.data.namespace}`);
         break;
+
       case 'Container':
         const labels = node.data.label.split(': ');
-
         information.push(`Container name: ${labels[1]}`);
         break;
+
       default:
         information.push(`Label: ${node.data.label}`)
     }
@@ -382,6 +418,10 @@ const Tree = (): JSX.Element => {
     const dialog = dialogDescriptor(information);
     setShowAlert([true, dialog]);
   };
+
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ---------------------------- JSX ELEMENTS TO RERENDER UPON DYNAMIC STYLE CHANGING --------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
 
   const updatedEdges: Edge[] = edges.map((edge) => ({
     ...edge,
@@ -391,7 +431,6 @@ const Tree = (): JSX.Element => {
         edge.id.startsWith('s-p') || edge.id.startsWith('p-c')
         ? (visibleEdges.has(edge.id) ? 'grey' : 'none') 
         : 'grey', 
-        
     },
   }));
 
@@ -406,8 +445,16 @@ const Tree = (): JSX.Element => {
       }
   }));
 
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ------------------------------------------ USING CLUSTER TIMELINE ------------------------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
+  // Grab new cluster history upon tree page refresh
+  useEffect(() => { fetchHistory(); }, [k8sCluster]);
+
+  //repopulate all nodes and edges upon clicking on previous cluster
   const handleSetClusterFromHistory = (pods: ClusterElement[], nodes: ClusterElement[], services: ClusterElement[]) => {
   
+    //creating node array of WORKER NODES
     const newNodes: Node[] = nodes.map((node, index) => ({
       id: node.name,
       data: { label: `Worker Node: ${node.name}`, data: node},
@@ -427,6 +474,7 @@ const Tree = (): JSX.Element => {
 
     const groupedPodsCache: Record<string, ClusterElement[]> = {};
 
+    //connecting WORKER NODES to PODS
     nodes.forEach((workerNode) => {
       const workerNodeName = workerNode.name;
       if (!groupedPodsCache[workerNodeName]) {
@@ -437,7 +485,7 @@ const Tree = (): JSX.Element => {
 
     const newPods: Node[] = [];
   
-    //positioning calculator based on indexes and grouped pods
+    //creating node array of PODS
     Object.keys(groupedPodsCache).forEach((nodeName, nodeIndex) => {
       groupedPodsCache[nodeName].forEach((pod, podIndex) => {
         const xPosition = nodeIndex * 400 + 70;  
@@ -457,6 +505,8 @@ const Tree = (): JSX.Element => {
         });
       });
     });
+
+    //creating node array of SERVICES
     const newServices: Node[] = services.map((service, index) => ({
       id: service.name,
       data: { label: `Service: ${service.name}`, data: service },
@@ -470,12 +520,7 @@ const Tree = (): JSX.Element => {
         },
     }));
 
-    const newNodeEdges: Edge[] = k8sNodesList.map((node, index) => ({
-      id: `el2-${index}`,
-      source: 'api-server',
-      target: node.name,
-    }));
-
+    //creating node array of CONTAINERS and corresponding edges
     const newContainerEdges: Edge[] = [];
     const newContainerNodes: Node[] = pods.flatMap((pod, podIndex) => {
       return pod.data.containers.map((container, containerIndex) => {
@@ -499,12 +544,20 @@ const Tree = (): JSX.Element => {
         };
       });
     });
+
+    const newNodeEdges: Edge[] = k8sNodesList.map((node, index) => ({
+      id: `el2-${index}`,
+      source: 'api-server',
+      target: node.name,
+    }));
+
     const newPodEdges: Edge[] = pods.map((pod, index) => ({
       id: `el3-${index}`,
       source: pod.data.nodeName,
       target: pod.name,
     }))
 
+    //creating edge array connecting SERVICES to PODS
     const connectedServices = new Set<string>();
     const newServiceEdges: Edge[] = services.flatMap((service, serviceIndex) => {
       if (!service.data.selector) return [];
@@ -525,41 +578,13 @@ const Tree = (): JSX.Element => {
       }));
     });
 
+    //rerender page through state change
     setNodes([...initialNodes, ...newNodes, ...newPods, ...newServices, ...newContainerNodes]);
     setEdges([...newNodeEdges, ...newPodEdges, ...newContainerEdges, ...newServiceEdges])
   }
 
-  const handleRefresh = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/cluster/refresh', {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const refreshedCluster: ClusterElement[] = await response.json();
-        setK8sCluster(refreshedCluster);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const handleSnapshot = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/cluster/postAll', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        console.log('Snapshot taken');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  /* ------------------------------------------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------------------------------------------------- */
 
   return (
     <>
