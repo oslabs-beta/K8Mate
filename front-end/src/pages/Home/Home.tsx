@@ -66,8 +66,8 @@ function Home() {
     <div data-testid='slogan' className="space-y-4">
       <Hero
         className="!pt-20 !pb-0"
-        header={`Super Kuber™`} 
-        subheader ={'Supercharge Your Kubernetes'} 
+        header={`K8 Mate™`} 
+        subheader ={'Your Trusted Kubernetes Monitoring & Analytics Partner'} 
       />
       <Divider className="my-10" soft />
       <SecondaryFeatures 
