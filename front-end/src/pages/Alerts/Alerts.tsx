@@ -196,7 +196,7 @@ function Alerts() {
   return (
     <>
       <div className="flex gap-2 mt-4 mb-12">
-        <MagnifyingGlassIcon className='w-4'/>
+        <MagnifyingGlassIcon className='w-4  dark:text-gray-300'/>
         <input 
           type="text" 
           placeholder="Search messages..." 
@@ -266,7 +266,7 @@ function Alerts() {
         >
           prev
         </Button>
-        <span className="text-gray-700 text-lg">
+        <span className="text-gray-700 text-m dark:text-gray-300">
           Page <strong>{newAlertsPage}</strong> of <strong>{totalNewAlertsPages}</strong>
         </span>
         <Button 
@@ -353,7 +353,7 @@ function Alerts() {
         >
           prev
         </Button>
-        <span className="text-gray-700 text-lg">
+        <span className="text-gray-700 text-m dark:text-gray-300">
           Page <strong>{resolvedAlertsPage}</strong> of <strong>{totalResolvedAlertsPages}</strong>
         </span>
         <Button 
