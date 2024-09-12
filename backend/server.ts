@@ -82,5 +82,4 @@ server.on('upgrade', (request: any, socket: any, head: any) => {
   });
 });
 
-
 export default app

@@ -13,19 +13,6 @@ import { SettingsProvider } from './contexts/SettingsContext.tsx'
 
 /* =================================================================== */
 
-// createRoot(document.getElementById("root")).render(
-//   <StrictMode>
-//     <SettingsProvider>
-//       <AlertsProvider>
-//         <BrowserRouter>
-//           <App />
-//         </BrowserRouter>
-//       </AlertsProvider>
-//     </SettingsProvider>
-//   </StrictMode>
-// );
-
-
 const root = document.getElementById("root") as Element;
 
 if (root) {
@@ -39,7 +26,5 @@ if (root) {
         </AlertsProvider>
       </SettingsProvider>
     </StrictMode>
-  )
-} else {
-  console.log('Error')
-}
+  );
+} else console.log('Error');

@@ -25,5 +25,6 @@ export type k8scontroller = {
 
 export type settingcontroller = {
   changeFile: RequestHandler,
+  getEnv: RequestHandler,
   addTables: RequestHandler
 }

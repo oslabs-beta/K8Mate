@@ -5,6 +5,7 @@ const db = require('../models/dbModel.ts')
 import { Request, Response, NextFunction } from 'express';
 import { settingcontroller } from '../../types.ts';
 
+type EnvVariables = { [key: string]: string; };
 
 // Helper functions
 function updateEnvFile(key: string, value: string): void {
@@ -13,13 +14,11 @@ function updateEnvFile(key: string, value: string): void {
 
   // Update or add the key-value pair
   const regex = new RegExp(`^${key}=.*`, 'm');
-  if (regex.test(envContent)) {
-    // Update existing key
+
+  // Update existing key or add new key
+  if (regex.test(envContent))
     envContent = envContent.replace(regex, `${key}=${value}`);
-  } else {
-    // Add new key
-    envContent += `\n${key}=${value}`;
-  }
+  else { envContent += `\n${key}=${value}`; }
 
   fs.writeFileSync(envFilePath, envContent, 'utf8');
   console.log(`Updated ${key} in .env file.`);
@@ -27,7 +26,9 @@ function updateEnvFile(key: string, value: string): void {
 
 
 // Controllers
-const settingController: settingcontroller = { changeFile: ()=>{}, addTables: ()=>{} }
+
+//change env files based on filled in settings components
+const settingController: settingcontroller = { changeFile: ()=>{}, getEnv: ()=>{}, addTables: ()=>{} }
 
 settingController.changeFile = (req: Request, res: Response, next: NextFunction) => {
   const { timezone, uri } = req.body;
@@ -37,7 +38,28 @@ settingController.changeFile = (req: Request, res: Response, next: NextFunction)
   return next();
 }
 
+//get the env files variables
+settingController.getEnv = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const envFilePath = path.resolve(__dirname, '../../.env');
+    if (!fs.existsSync(envFilePath)) { throw new Error (`.env file not found at ${envFilePath}`); }
 
+    const envContent = fs.readFileSync(envFilePath, 'utf8');
+    const envVariables: EnvVariables = {};
+
+    envContent.split('\n').forEach((line: string) => {
+      if (line.trim() && !line.startsWith('#')) {
+        const [key, value] = line.split('=');
+        envVariables[key.trim()] = value ? value.trim() : '';
+      }
+    });
+    
+    res.locals.envcontent = envVariables;
+    return next();
+  } catch (err) { return next(err); }
+}
+
+//check if database has necessary tables => if not, create the tables
 settingController.addTables = async (req: Request, res: Response, next: NextFunction) => { 
   console.log('inside add tables');
   try { await db.query('SELECT 1 FROM alerts LIMIT 1'); } 
