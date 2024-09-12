@@ -1,3 +1,5 @@
+<div align="center">
+
 ## K8 Mate
 <p align="center">
   <a href="https://www.typescriptlang.org/">
@@ -52,6 +54,66 @@
     <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/>
   </a>
 </p>
+
+---
+
+<p align="center" style="font-size: 1em">
+<a name="website" href="https://oslabs-beta.github.io/MorpheusLanding/](https://github.com/oslabs-beta/K8Mate">Website</a>
+<a name="medium" href="">Medium</a>
+<a name="linkedin" href="">LinkedIn</a>
+</p>
+</div>
+
+
+### Welcome to K8 Mate - v1.0.0
+Welcome to K8 Mate, a light-weight, easy-to-use Kubernetes management and observability tool.
+
+| Features                                                     |
+| ------------------------------------------------------------ |
+| Dashboard forfor key metrics monitoring via Prometheus API                  |
+| Real-time alerts for resource usage, pod outages, restarts, and other structural changes                |
+| K8 cluster visualization tool via React Flow to manage and cluster architecture | 
+| Built-in Terminal view to manage your cluster, nodes, pods, and services |
+ 
+## Getting Started
+
+**IMPORTANT -- Requirements to Use K8 Mate**  
+
+✅ Active Kubernetes cluster deployed on AWS  
+✅ Kubectl configured on local machine  
+✅ Prometheus installed on your K8 cluster  
+✅ Grafana installed on your K8 cluster  
+✅ An active database for your team in PostgresQL (only supported at this time)
+
+**How to Run the App**
+1. Install npm dependencies `npm install` in the root, frontend, and backend directories, for a total of 3 times.
+2. Expose port 9090 to the Prometheus API `kubectl port-forward svc/prometheus-node-port-service 9090:9090`
+3. Expose port 3000 to the Grafana service node `kubectl port-forward svc/grafana-node-port-service 3000:80`
+5. Run the development server `npm run dev` from the root directory
+6. Connect your DB in the settings tab! Setup is already provided in our backend directory to interact with your DB.
+7. All done!
+
+## Feature Highlights
+
+| Reports                                                     | Alerts                                                     |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
+| <img src="https://github.com/user-attachments/assets/0bc42378-fb4d-4daa-b522-5ddc58d9e9f6" alt="dashboard-showcase" style="width: 400px; border-radius: 8px;" /> | <img src="https://github.com/user-attachments/assets/dfa532d8-8d07-483a-af3a-a8167e66e7b0" alt="alerts-showcase" style="width: 400px; border-radius: 8px;" /> |
+
+| K8 Visualization                                            | In-App Terminal                                            |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
+| <img src="https://github.com/user-attachments/assets/3a5b7840-6ee4-4de1-8517-1a7e6a2672eb" alt="K8 Dashboard" style="width: 400px; border-radius: 8px;" /> | <img src="https://github.com/user-attachments/assets/e68aeb73-dda9-4ffb-a46a-c0fbbfff1aba" alt="K8 Terminal" style="width: 400px; border-radius: 8px;" /> |
+
+
+## Want to Contribute?
+
+Our goal is to continue to evolve K8 Mate, expanding features while maintaing its ease-of-use. We're grateful to the community for contributing bugfixes and improvements. Read below to learn how you can take part in improving K8 Mate.
+
+- Fork the project.
+- Create and work off of your feature branch.
+- Create a pull request with a detailed description of your changes from your feature branch to dev branch.
+- Please let us know when PR submission is done. Once the changes are reviewed and approved, we will merge your code into the main repository.
+
+Follow our dev READme to learn more
 
 
 
