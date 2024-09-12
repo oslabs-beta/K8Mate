@@ -29,18 +29,13 @@ interface SettingsContextType {
   uri: string;
 }
 
-export const metadata = {
-  title: "Settings",
-};
+export const metadata = { title: "Settings", };
 
 export default function Settings() {
     const [message, setMessage] = useState<string>('')
 
-
     const context = useContext(SettingsContext) as SettingsContextType;
-    if (!context) {
-      throw new Error('Context not within provider')
-    }
+    if (!context) throw new Error('Context not within provider');
 
     const {
       timezone, 
@@ -94,7 +89,6 @@ export default function Settings() {
     console.log('form submitted')
     e.preventDefault()
     setMessage('Settings saved')
-
 
     const form = e.target as HTMLFormElement; // Cast the event target to an HTMLFormElement
 
@@ -171,10 +165,7 @@ export default function Settings() {
 
       <div className="flex justify-end gap-4">
         <Text className ="flex justify-center items-center">{message}</Text>
-        
-        <Button data-testid='submit' type="submit" color="superPurple">Save changes</Button>
-        
-        
+        <Button data-testid='submit' type="submit" color="superPurple">Save changes</Button>        
       </div>
     </form>
   );

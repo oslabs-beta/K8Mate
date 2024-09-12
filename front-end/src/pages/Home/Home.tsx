@@ -60,9 +60,7 @@ function Home() {
     },
   ]
   
-
   return (
-    
     <div data-testid='slogan' className="space-y-4">
       <Hero
         className="!pt-20 !pb-0"

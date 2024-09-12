@@ -10,6 +10,8 @@ import { k8scontroller } from '../../types.ts';
 
 const k8sController: k8scontroller = {getPods: ()=>{}, getNodes: ()=>{}, getServices: ()=>{}};
 
+//Gets information from cluster
+
 //gets all pod information from the cluster and passes it into the response locals object
 k8sController.getPods = async (req: Request, res: Response, next: NextFunction) => {
   try {

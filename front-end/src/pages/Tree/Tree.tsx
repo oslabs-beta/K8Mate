@@ -134,7 +134,10 @@ const Tree = (): JSX.Element => {
   }
 
   const handleSnapshot = async () => {
-    try { await postSnapshot(); } 
+    try { 
+      await postSnapshot(); 
+      await fetchHistory();
+    } 
     catch (err) { console.log(err); }
   }
 
@@ -143,6 +146,7 @@ const Tree = (): JSX.Element => {
       const response = await getHistory();
       
       const clusterHistory: ClusterElement[] = response;
+      console.log(response);
       setK8sClusterHistory(clusterHistory);
     } catch (err) { console.log(err); }
   }
@@ -634,9 +638,8 @@ const Tree = (): JSX.Element => {
         {k8sClusterHistory.length > 0 ? (
           <div style={{ height: '100%', width: '100%', position: 'relative', marginTop: '20px' }}>
             <Chrono
-              items={k8sClusterHistory.map((cluster, index) => ({
-                title: new Date(cluster.created_at).toLocaleString(),
-                key: index,
+              items={k8sClusterHistory.map((cluster) => ({
+                title: new Date(cluster.created_at).toLocaleString()
               }))}
               mode="HORIZONTAL"
               allowDynamicUpdate={true}
@@ -666,7 +669,7 @@ const Tree = (): JSX.Element => {
               itemWidth={125}
               
               focusActiveItemOnLoad={true}
-              onScrollEnd	
+              onScrollEnd={()=>{}}
             />
           </div>
         ) : (

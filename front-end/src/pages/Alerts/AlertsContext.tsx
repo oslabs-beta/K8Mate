@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogDescription, DialogActions } from '../../components/template/catalyst/dialog'
 import { Button } from '../../components/template/catalyst/button'
-import { createAlert, getAlerts, promQuery } from '../../services/alertscontextservice.ts';
+import { createAlert, getAlerts, promQuery } from '../../services/alertsService.ts';
 import { AvailMem, PodDetails, NetworkData, DiskData, CpuData } from '../../../fronttypes.ts'
 
 type AlertsContextsValues = {

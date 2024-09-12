@@ -10,6 +10,7 @@ import { Text, TextLink } from '../../components/template/catalyst/text.tsx'
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
+import { getAlerts, putAlerts, deleteAlerts } from '../../services/alertsService.ts';
 import { convertToMilitaryTime } from '../../hooks/useData.ts';
 import { AlertsContext } from './AlertsContext.tsx';
 import { SettingsContext } from '../../contexts/SettingsContext.tsx';
@@ -70,20 +71,10 @@ function Alerts() {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:8080/alert/all', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        if (response.ok) {
-          const alerts: AlertData[] = await response.json();
-          updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
-          setAlertList(alerts);
-        }
-      } catch (err) {
-        console.log(err);
-      }
+        const alerts = await getAlerts();
+        updateAlertsUnreadStatus(alerts.some(alert => alert.read === 'unread'));
+        setAlertList(alerts);
+      } catch (err) { console.log(err); }
     };
     fetchAlerts();
   }, [newReadStatus]);
@@ -91,41 +82,23 @@ function Alerts() {
   // instnat render of alerts
   const updateAlerts = async (alertName: string, id: string, newStatus: "read" | "unread") => {
     const updatedAlerts = alertList.map(alert => {
-      if (alert.id === id) {
-        return { ...alert, read: newStatus };
-      } else {
-        return alert;
-      }
+      if (alert.id === id) { return { ...alert, read: newStatus }; } 
+      else { return alert; }
     });
+
     setAlertList(updatedAlerts);
 
     try {
-      const response = await fetch('http://localhost:8080/alert/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: alertName,
-          db_id: id,
-          status: newStatus,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update alert status');
-      }
-
-      // Optionally update the status after confirmation
-      const data = await response.json();
+      await putAlerts(alertName, id, newStatus);
       setReadStatus([alertName, id, newStatus].toString());
     } catch (err) {
       console.error(err);
 
       // Revert the optimistic update in case of an error
       const revertedAlerts: AlertData[] = alertList.map(alert =>
-        alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert
+        alert.id === id ? { ...alert, read: newStatus === 'unread' ? 'read' : 'unread' } : alert 
       );
+
       setAlertList(revertedAlerts);
     }
   };
@@ -139,22 +112,9 @@ function Alerts() {
 
   const deleteAlert = async (id: string, log: string) => {
     try {
-      const response = await fetch('http://localhost:8080/alert/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: id,
-          log: log
-        })
-      });
-      if (response.ok) {
-        setAlertList(prevList => prevList.filter(alert => alert.id !== id));
-      }
-    } catch (err) {
-      console.log(err);
-    }
+      await deleteAlerts(id, log);
+      setAlertList(prevList => prevList.filter(alert => alert.id !== id));
+    } catch (err) { console.log(err); }
   };
 
   const filteredAlerts = alertList.filter(alert => 

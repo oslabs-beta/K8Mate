@@ -43,8 +43,7 @@ function App(props) {
         <Route path="*" element={<Notfound />} />
       </Routes>
     </div>
-  )
-}
+  );
+};
 
-export default App
-
+export default App;

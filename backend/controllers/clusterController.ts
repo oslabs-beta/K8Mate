@@ -14,7 +14,7 @@ async function alertQuery(qstring: string, values?: any[]): Promise<QueryResult>
 };
 
 /* -------------------------------- CLUSTER HISTORY MIDDLEWARE -------------------------------- */
-
+// Parses through clusters and puts it into the database
 //posts a current "snapshot" of the cluster on to the database history table
 clusterController.postSnapshot = (req: Request, res: Response, next: NextFunction) => {
   const info: {pods: any[], nodes: any[], services: any[]} = {pods: [], nodes: [], services: []};

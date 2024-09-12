@@ -13,7 +13,7 @@ router.get('/history',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.history);
   }
-)
+);
 
 //post new recent cluster into CLUSTER HISTORY
 router.post('/postAll',
@@ -24,7 +24,7 @@ router.post('/postAll',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.cluster);
   }
-)
+);
 
 
 /* ---------- SINGLE TEST CLUSTER ROUTES ---------- */
@@ -34,7 +34,7 @@ router.get('/all',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.cluster);
   }
-)
+);
 
 //refresh SINGLE test cluster page: delete rows, repost data, get all
 router.get('/refresh',
@@ -49,7 +49,7 @@ router.get('/refresh',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.cluster);
   }
-)
+);
 
 //post all recent pods into SINGLE cluster table
 router.post('/postPods',
@@ -58,7 +58,7 @@ router.post('/postPods',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.pods);
   }
-)
+);
 
 //post all recent nodes into SINGLE cluster table
 router.post('/postNodes',
@@ -67,7 +67,7 @@ router.post('/postNodes',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.nodes);
   }
-)
+);
 
 //post all recent services into SINGLE cluster table
 router.post('/postServices',
@@ -76,6 +76,6 @@ router.post('/postServices',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.services);
   }
-)
+);
 
 module.exports = router;

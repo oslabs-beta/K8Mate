@@ -24,13 +24,8 @@ export function convertToMilitaryTime(
     const formattedDate = date.toLocaleDateString('en-US', { timeZone });
 
     // Return the final formatted date and time string based on the request
-    if (request === 'date') {
-        return formattedDate;
-    }
-
-    if (request === 'timestamp') {
-        return time;
-    }
+    if (request === 'date') return formattedDate;
+    if (request === 'timestamp') return time;
 
     // Optionally, return both date and time if request is not specified or needs both
     return `${formattedDate} ${time}`;

@@ -11,7 +11,7 @@ router.post('/create',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }
-)
+);
 
 //get an object of all alerts from database
 router.get('/all',
@@ -19,7 +19,7 @@ router.get('/all',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals.alerts);
   }
-)
+);
 
 //update an existing alerts status
 router.put('/update',
@@ -27,7 +27,7 @@ router.put('/update',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }
-)
+);
 
 //delete an existing alert
 router.delete('/delete',
@@ -35,6 +35,6 @@ router.delete('/delete',
   (req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }
-)
+);
 
 module.exports = router;
