@@ -1,6 +1,7 @@
 <div align="center">
 
-## K8 Mate
+![Asset 8@3x-100](https://github.com/user-attachments/assets/bd9aa57c-0f0a-46b6-9923-8107d491f2ff)
+
 <p align="center">
   <a href="https://www.typescriptlang.org/">
     <img src="https://img.shields.io/badge/typescript-blue?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
