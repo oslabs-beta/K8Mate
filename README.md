@@ -80,7 +80,7 @@ Welcome to K8 Mate, a light-weight, easy-to-use Kubernetes management and observ
 
 **IMPORTANT -- Requirements to Use K8 Mate**  
 
-✅ Active Kubernetes cluster deployed on AWS  
+✅ Active Kubernetes cluster spun up  
 ✅ Kubectl configured on local machine  
 ✅ Prometheus installed on your K8 cluster  
 ✅ Grafana installed on your K8 cluster  
