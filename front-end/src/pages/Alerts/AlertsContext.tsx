@@ -290,7 +290,7 @@ const AlertsProvider = ({ children }) => {
   // POST request for Restarted Pod
   const podRestartAlert = async (restartedPod, restartedPodID) => {
     try {
-      const response = await createAlert('Pod', restartedPod, restartedPodID, `${restartedPod} has started`);
+      const response = await createAlert('Pod', restartedPod, `${restartedPod} has started`, restartedPodID);
       console.log('Restarted pod alert was sent successfully');
     } catch (err: unknown) { console.log(err); }
   }
