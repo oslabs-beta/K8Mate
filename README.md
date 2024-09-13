@@ -71,7 +71,7 @@ Welcome to K8 Mate, a light-weight, easy-to-use Kubernetes management and observ
 
 | Features                                                     |
 | ------------------------------------------------------------ |
-| Dashboard forfor key metrics monitoring via Prometheus API                  |
+| Dashboard for key metrics monitoring via Prometheus API                  |
 | Real-time alerts for resource usage, pod outages, restarts, and other structural changes                |
 | K8 cluster visualization tool via React Flow to manage and cluster architecture | 
 | Built-in Terminal view to manage your cluster, nodes, pods, and services |
@@ -87,7 +87,7 @@ Welcome to K8 Mate, a light-weight, easy-to-use Kubernetes management and observ
 ✅ An active database for your team in PostgresQL (only supported at this time)
 
 **How to Run the App**
-1. Install npm dependencies `npm install` in the root, frontend, and backend directories, for a total of 3 times.
+1. Install npm dependencies `npm install` in the root, front-end, and backend directories, for a total of 3 times.
 2. Expose port 9090 to the Prometheus API `kubectl port-forward svc/prometheus-node-port-service 9090:9090`
 3. Expose port 3000 to the Grafana service node `kubectl port-forward svc/grafana-node-port-service 3000:80`
 5. Run the development server `npm run dev` from the root directory
