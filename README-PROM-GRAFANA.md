@@ -1,10 +1,10 @@
-### Installation guide for Prometheus and Grafana
+## Installation guide for Prometheus and Grafana
 Before running K8 Mate, please ensure you have Prometheus and Grafana installed. Below gives you a simple breakdown of how to do this!
 
 ## Install Helm
-On Linux run `sudo apt-get install helm`
-On Windows run `choco install Kubernetes-helm`
-On macOS run `brew install helm`
+- On Linux run `sudo apt-get install helm`
+- On Windows run `choco install Kubernetes-helm`
+- On macOS run `brew install helm`
 
 ## Add the Helm chart for Prometheus and Grafana
 1. Run `helm repo add prometheus-community https://prometheus-community.github.io/helm-charts`
